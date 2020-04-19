@@ -42,7 +42,7 @@ public:
     std::vector<uint64_t> nwlist;
     std::vector<uint64_t> mwlist;
     std::vector<std::vector<nonzero_element> > nlist;
-    std::vector<std::vector<nonzero_element> > mlist
+    std::vector<std::vector<nonzero_element> > mlist;
 
     /* constructors */
     gfq_alist(void) : number_of_columns(0), number_of_rows(0), characteristic(0), max_column_weight(0), max_row_weight(0) {}
@@ -60,6 +60,7 @@ public:
             std::cerr << "Error in gfq_parse_alist" << std::endl;
             exit(-1);
         }
+        ifs.close();
     }
 
     int gfq_parse_alist(std::ifstream& ifs) {
@@ -130,6 +131,29 @@ public:
             }
         }
         return(1);
+    } 
+
+    std::vector<std::vector<Galois::Element> > make_dense(void) {
+        Galois::Field gf(this->Characteristic);
+        Galois::Element zero(&gf, 0);
+        uint64_t uli, ulj;
+        std::vector<std::vector<Galois::Element> > H;
+        std::vector<Galois::Element> v;
+        std::vector<nonzero_element>::iterator vit;
+
+        for(ulj = 0; ulj < this->number_of_columns; ulj++) {
+            v.push_back(zero);
+        }
+        for(uli = 0; uli < this->number_of_rows; uli++) {
+            H.push_back(v);
+        }
+
+        for(uli = 0; uli < this->number_of_rows; uli++) {
+            for(vit = this->mlist[uli].begin(); vit != this->mlist[uli].end(); ++vit) {
+                H[uli][vit->first - 1] = vit->second;
+            }
+        }
+        return(H);
     }
 };
 #endif /* GFQ_ALIST_H_ */

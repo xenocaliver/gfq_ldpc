@@ -15,6 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include <iostream>
+#include <fstream>
 #include <cstdlib>
 #include <vector>
 #include <string>
@@ -23,6 +24,52 @@
 #include <galois++/field.h>
 #include <galois++/fwd.h>
 #include <galois++/primes.h>
+#include <msgpack/msgpack.hpp>
+#include "gfq_alist.hpp"
+#include "generating_matrix.hpp"
 
-extern std::vector<std::vector<Galois::Field> > gfq_matrix_product(std::vector<std::vector<Galois::Field> >&, std::vector<std::vector<Galois::Field> >&, Galois::Field&);
-extern std::vector<std::vector<Galois::Field> > make_generating_matrix(std::vector<std::vector<Galois::Field> >&, Galois::Field&);
+extern std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<std::vector<Galois::Element> >&, Galois::Field*);
+
+int main(int argc, char** argv) {
+    std::ifstream ifs;
+    std::ofstream ofs;
+    std::vector<std::vector<Galois::Element> > G, H;
+    uint64_t characteristic;
+    gemerating_matrix g;
+    Galois::Field* gf;
+    uint64_t number_of_rows, number_of_columns;
+    uint64_t uli, ulj;
+    msgpack::sbuffer buf;
+    
+    if(argc != 3) {
+        std::cerr << "Usage: " << argv[0] << " <GF(q) alist file name> <generating matrix file name>" << std::endl;
+        return(EXIT_FAILURE);
+    }
+    gfq_alist(argv[1]);
+    characteristic = gfq_alist.characteristic;
+    H = gfq_alist.make_dense();
+    gf = H[0][0].field();
+    G = make_generating_matrix(H, gf)
+    number_of_rows = G.size();
+    number_of_columns = G[0].size();
+    std::vector<std::vector<uint64_t> > g_contents(number_of_rows, std::vector<uint64_t>(number_of_columns, 0));
+
+    for(uli = 0; uli < number_of_rows; uli++) {
+        for(ulj = 0; ulj < number_of_columns; ulj++) {
+            g_contents[uli][ulj] = G[uli][ulj].value();
+        }
+    }
+
+    g.characteristic = characteristic;
+    g.contents = g_contens;
+    msgpack::pack(buf, g);
+
+    ofs.open(argv[2], std::ios::binary | std::ios::out);
+    if(!ofs){
+        std::cerr << "Can not open file: " << argv[2] << std::endl;
+        return(EXIT_FAILURE);
+    }
+    ofs.write(buf.data(), buf.size());
+    ofs.close();
+    return(EXIT_SUCCESS);
+}

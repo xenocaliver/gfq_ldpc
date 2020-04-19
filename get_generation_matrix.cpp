@@ -1,5 +1,5 @@
 /* 
- * This file is part of the GFq_ludecomp distribution (https://github.com/xenocaliver).
+ * This file is part of the gfq_ldpc distribution (https://github.com/xenocaliver).
  * Copyright (c) 2020 Akiyoshi Hashimoto.
  * 
  * This program is free software: you can redistribute it and/or modify  
@@ -24,10 +24,10 @@
 #include <galois++/fwd.h>
 #include <galois++/primes.h>
 
-std::vector<std::vector<Galois::Element> > gfq_matrix_product(std::vector<std::vector<Galois::Element> >& A, std::vector<std::vector<Galois::Element> >& B, Galois::Field& gf) {
+std::vector<std::vector<Galois::Element> > gfq_matrix_product(std::vector<std::vector<Galois::Element> >& A, std::vector<std::vector<Galois::Element> >& B, Galois::Field* gf) {
     uint64_t uli, ulj, ulk;
     std::vector<uint64_t> row_size, column_size;
-    Galois::Element zero(&gf, 0);
+    Galois::Element zero(gf, 0);
     std::vector<Galois::Element> v;
     std::vector<std::vector<Galois::Elememnt> > C;
 
@@ -52,7 +52,7 @@ std::vector<std::vector<Galois::Element> > gfq_matrix_product(std::vector<std::v
     return(C);
 }
 
-std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<std::vector<Galois::Element> >& parity_check_matrix, Galois::Field gf) {
+std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<std::vector<Galois::Element> >& parity_check_matrix, Galois::Field* gf) {
     std::vector<std::vector<Galois::Element> > A;
     std::vector<std::vector<Galois::Element> > B;
     std::vector<std::vector<Galois::Element> > L;
@@ -65,8 +65,8 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
     uint64_t row_size;
     Galois::Element sum;
 
-    Galois::Element zero(&gf, 0);
-    Galois::Element one(&gf, 1);
+    Galois::Element zero(gf, 0);
+    Galois::Element one(gf, 1);
 
     row_size = parity_check_matrix[0];
 
