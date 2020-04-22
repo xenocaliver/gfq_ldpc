@@ -28,6 +28,7 @@ std::vector<std::vector<Galois::Element> > gfq_matrix_product(std::vector<std::v
     uint64_t uli, ulj, ulk;
     std::vector<uint64_t> row_size, column_size;
     Galois::Element zero(gf, 0);
+    Galois::Element sum;
     std::vector<Galois::Element> v;
     std::vector<std::vector<Galois::Elememnt> > C;
 
@@ -46,7 +47,9 @@ std::vector<std::vector<Galois::Element> > gfq_matrix_product(std::vector<std::v
 
     for(uli = 0; uli < row_size[0]; uli++) {
         for(ulj = 0; ulj < column_size[1]; ulj++) {
-            for(ulk = 0; ulk < column_size[0]) C[uli][ulj] = A[uli][ulk]*B[ulk][ulj];
+            sum = zero;
+            for(ulk = 0; ulk < column_size[0]) sum += A[uli][ulk]*B[ulk][ulj];
+            C[uli][ulj] = sum;
         }
     }
     return(C);

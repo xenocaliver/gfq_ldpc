@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
     }
 
     g.characteristic = characteristic;
-    g.contents = g_contens;
+    g.contents = g_contents;
     msgpack::pack(buf, g);
 
     ofs.open(argv[2], std::ios::binary | std::ios::out);
