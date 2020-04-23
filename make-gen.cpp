@@ -24,19 +24,19 @@
 #include <galois++/field.h>
 #include <galois++/fwd.h>
 #include <galois++/primes.h>
-#include <msgpack/msgpack.hpp>
+#include <msgpack.hpp>
 #include "gfq_alist.hpp"
 #include "generating_matrix.hpp"
 
-extern std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<std::vector<Galois::Element> >&, Galois::Field*);
+extern std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<std::vector<Galois::Element> >&, const Galois::Field*);
 
-int main(int argc, char** argv) {
+int main(int argc, char* argv[]) {
     std::ifstream ifs;
     std::ofstream ofs;
     std::vector<std::vector<Galois::Element> > G, H;
     uint64_t characteristic;
-    gemerating_matrix g;
-    Galois::Field* gf;
+    generating_matrix g;
+    const Galois::Field* gf;
     uint64_t number_of_rows, number_of_columns;
     uint64_t uli, ulj;
     msgpack::sbuffer buf;
@@ -45,11 +45,11 @@ int main(int argc, char** argv) {
         std::cerr << "Usage: " << argv[0] << " <GF(q) alist file name> <generating matrix file name>" << std::endl;
         return(EXIT_FAILURE);
     }
-    gfq_alist(argv[1]);
-    characteristic = gfq_alist.characteristic;
-    H = gfq_alist.make_dense();
+    gfq_alist alist = gfq_alist(argv[1]);
+    characteristic = alist.characteristic;
+    H = alist.make_dense();
     gf = H[0][0].field();
-    G = make_generating_matrix(H, gf)
+    G = make_generating_matrix(H, gf);
     number_of_rows = G.size();
     number_of_columns = G[0].size();
     std::vector<std::vector<uint64_t> > g_contents(number_of_rows, std::vector<uint64_t>(number_of_columns, 0));

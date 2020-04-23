@@ -21,6 +21,16 @@ set(galois_CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${galois_INSTALL_DIR})
 message("galois_PREFIX = '${galois_PREFIX}'")
 message("galois_INSTALL_DIR = '${galois_INSTALL_DIR}'")
 
+set(Boost_USE_STATIC_LIBS    ON)
+set(Boost_USE_MULTITHREADED  ON)
+set(Boost_INCLUDE_DIR "/usr/local/include/boost")
+set(Boost_LIBRARY_DIR "/usr/local/lib")
+ 
+find_package(Boost 1.72.0 REQUIRED)
+message(STATUS "  Boost_INCLUDE_DIR=${Boost_INCLUDE_DIR}")
+message(STATUS "  Boost_LIBRARY_DIR=${Boost_LIBRARY_DIR}")
+message(STATUS "  Boost_LIBRARIES  =${Boost_LIBRARIES}")
+
 include(ExternalProject)
 ExternalProject_Add(galois
 ### Set prefix
@@ -38,6 +48,9 @@ ExternalProject_Add(galois
                     cp -r ${galois_PREFIX}/src/galois/include ${PROJECT_BINARY_DIR}/
 )
 
-add_executable(gfq_ldpc ludecomp.cpp make-gen.cpp)
-add_dependencies(LUdecomp galois)
-target_link_libraries(LUdecomp ${DEPEND_LIB_ROOT}/libgalois++.a)
+include_directories("/usr/include" "/usr/local/include" "${Boost_INCLUDE_DIRS}")
+link_directories("/usr/lib" "/usr/local/lib" "${Boost_LIBRARY_DIR}")
+
+add_executable(make-gen make-gen.cpp get_generating_matrix.cpp generating_matrix.hpp gfq_alist.hpp)
+add_dependencies(make-gen galois)
+target_link_libraries(make-gen ${DEPEND_LIB_ROOT}/libgalois++.a Boost::boost)

@@ -24,23 +24,23 @@
 #include <galois++/fwd.h>
 #include <galois++/primes.h>
 
-std::vector<std::vector<Galois::Element> > gfq_matrix_product(std::vector<std::vector<Galois::Element> >& A, std::vector<std::vector<Galois::Element> >& B, Galois::Field* gf) {
+std::vector<std::vector<Galois::Element> > gfq_matrix_product(std::vector<std::vector<Galois::Element> >& A, std::vector<std::vector<Galois::Element> >& B, const Galois::Field* gf) {
     uint64_t uli, ulj, ulk;
     std::vector<uint64_t> row_size, column_size;
     Galois::Element zero(gf, 0);
-    Galois::Element sum;
+    Galois::Element sum = zero;
     std::vector<Galois::Element> v;
-    std::vector<std::vector<Galois::Elememnt> > C;
+    std::vector<std::vector<Galois::Element> > C;
 
     row_size.resize(2);
-    column_size.resize(2)
+    column_size.resize(2);
     column_size[0] = A.size();
     row_size[0]=A[0].size();
     column_size[1] = B.size();
     row_size[1] = B[0].size();
     if(column_size[0] != row_size[1]) {
         std::cerr << "Can not match dimension:" << row_size[0] << ", " << column_size[0] << ", " << row_size[1] << ", " << column_size[1] << std::endl;
-        exit(1)
+        exit(1);
     }
     for(ulj = 0; ulj < column_size[1]; ulj++) v.push_back(zero);
     for(uli = 0; uli < row_size[0]; uli++) C.push_back(v);
@@ -48,14 +48,14 @@ std::vector<std::vector<Galois::Element> > gfq_matrix_product(std::vector<std::v
     for(uli = 0; uli < row_size[0]; uli++) {
         for(ulj = 0; ulj < column_size[1]; ulj++) {
             sum = zero;
-            for(ulk = 0; ulk < column_size[0]) sum += A[uli][ulk]*B[ulk][ulj];
+            for(ulk = 0; ulk < column_size[0]; ulk++) sum += A[uli][ulk]*B[ulk][ulj];
             C[uli][ulj] = sum;
         }
     }
     return(C);
 }
 
-std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<std::vector<Galois::Element> >& parity_check_matrix, Galois::Field* gf) {
+std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<std::vector<Galois::Element> >& parity_check_matrix, const Galois::Field* gf) {
     std::vector<std::vector<Galois::Element> > A;
     std::vector<std::vector<Galois::Element> > B;
     std::vector<std::vector<Galois::Element> > L;
@@ -66,15 +66,15 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
     std::vector<Galois::Element> v;
     uint64_t uli, ulj, ulk;
     uint64_t row_size;
-    Galois::Element sum;
 
     Galois::Element zero(gf, 0);
     Galois::Element one(gf, 1);
+    Galois::Element sum = zero;
 
-    row_size = parity_check_matrix[0];
+    row_size = parity_check_matrix[0].size();
 
     /* create square matrix A */
-    for(uli = 0; uli < row_size; uli++) A.push_back(parity_check_matrix[uli])
+    for(uli = 0; uli < row_size; uli++) A.push_back(parity_check_matrix[uli]);
     /* create residual part matrix B */
     for(uli = row_size; uli < parity_check_matrix.size(); uli++) B.push_back(parity_check_matrix[uli]);
     /* initialize L and U */
@@ -126,12 +126,12 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
     }
 
     /* backword substitution */
-    copy(Y.begin(), Y.end(), X.start());
+    copy(Y.begin(), Y.end(), X.begin());
     for(ulj = 0; ulj < row_size; ulj++) {
         for(ulk = row_size - 1; ulk >=0; ulk--) {
             X[ulk][ulj] = X[ulk][ulj]/U[ulk][ulk];
             for(uli = 0; uli < ulk; uli++){
-                X[uli][ulj] = X[uli][ulj] - U[uli][ulk]*X[ulk][ulj]
+                X[uli][ulj] = X[uli][ulj] - U[uli][ulk]*X[ulk][ulj];
             }
         }
     }

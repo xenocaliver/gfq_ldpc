@@ -22,4 +22,4 @@ public:
     std::vector<std::vector<uint64_t> > contents;
     generating_matrix(void){}
     MSGPACK_DEFINE(characteristic, contents);
-}
+};
