@@ -36,14 +36,15 @@ std::vector<std::vector<Galois::Element> > gfq_matrix_product(std::vector<std::v
 
     row_size.resize(2);
     column_size.resize(2);
-    column_size[0] = A.size();
-    row_size[0]=A[0].size();
-    column_size[1] = B.size();
-    row_size[1] = B[0].size();
+    column_size[0] = A[0].size();
+    row_size[0]=A.size();
+    column_size[1] = B[0].size();
+    row_size[1] = B.size();
     if(column_size[0] != row_size[1]) {
         std::cerr << "Can not match dimension:" << row_size[0] << ", " << column_size[0] << ", " << row_size[1] << ", " << column_size[1] << std::endl;
         exit(1);
     }
+    v.clear();
     for(ulj = 0; ulj < column_size[1]; ulj++) v.push_back(zero);
     for(uli = 0; uli < row_size[0]; uli++) C.push_back(v);
 
@@ -124,7 +125,7 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
     std::vector<std::vector<Galois::Element> > A;
     std::vector<std::vector<Galois::Element> > B;
     std::vector<std::vector<Galois::Element> > I;
-    std::vector<std::vector<Galois::Element> > X, Y;
+    std::vector<std::vector<Galois::Element> > X, Y, P;
     std::vector<std::vector<Galois::Element> > G, Gdash;
     std::vector<std::vector<Galois::Element> > full_rank_matrix;
     std::list<std::vector<std::vector<Galois::Element> > > list_of_Q;
@@ -249,7 +250,7 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
         for(i = row_size - 1; i >= 0; i--) {
             sum = X[i][ulj];
             for(ulk = i + 1; ulk < row_size; ulk++) {
-                sum -= A[uli][ulk]*X[ulk][ulj];
+                sum -= A[i][ulk]*X[ulk][ulj];
             }
             X[i][ulj] = sum;
         }
@@ -264,12 +265,34 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
 
     /* Now, get generating matrix of parity check matrix */
     Gdash = gfq_matrix_product(X, B, gf);
+
     v.clear();
-    for(uli = 0; uli < Gdash.size(); uli++) {
-        for(ulj = 0; ulj < Gdash[0].size(); ulj++) {
-            std::cout << Gdash[uli][ulj].value() << " ";
+    for(ulj = 0; ulj < column_size - row_size; ulj++) v.push_back(zero);
+    for(uli = 0; uli < column_size; uli++) G.push_back(v);
+
+    for(uli = 0; uli < column_size - row_size; uli++) {
+        for(ulj = 0; ulj < column_size - row_size; ulj++) {
+            G[uli][ulj] = Gdash[uli][ulj];
+        }
+    }
+    for(uli = 0; uli < column_size - row_size; uli++) G[uli + column_size - row_size][uli] = one;
+
+    std::cout << "**** Generating matrix ****" << std::endl;
+    for(uli = 0; uli < column_size; uli++) {
+        for(ulj = 0; ulj < column_size - row_size; ulj++) {
+            std::cout << std::setw(2) << G[uli][ulj].value() << " ";
         }
         std::cout << std::endl;
     }
+
+    P = gfq_matrix_product(full_rank_matrix, G, gf);
+    std::cout << "**** parity check result ****" << std::endl;
+    for(uli = 0; uli < P.size(); uli++) {
+        for(ulj = 0; ulj < P[0].size(); ulj++) {
+            std::cout << std::setw(2) << P[uli][ulj].value() << " ";
+        }
+        std::cout << std::endl;
+    }
+
     return(G);
 }
