@@ -125,7 +125,7 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
     std::vector<std::vector<Galois::Element> > A;
     std::vector<std::vector<Galois::Element> > B;
     std::vector<std::vector<Galois::Element> > I;
-    std::vector<std::vector<Galois::Element> > X, Y, P;
+    std::vector<std::vector<Galois::Element> > X, Y, Z, P;
     std::vector<std::vector<Galois::Element> > G, Gdash;
     std::vector<std::vector<Galois::Element> > full_rank_matrix;
     std::list<std::vector<std::vector<Galois::Element> > > list_of_Q;
@@ -166,9 +166,7 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
         }
         std::cout << std::endl;
     }
-
     v.clear();
-    /* create square matrix A */
     for(uli = 0; uli < row_size; uli++) v.push_back(zero);
     for(uli = 0; uli < row_size; uli++) A.push_back(v);
     for(uli = 0; uli < row_size; uli++) {
@@ -182,24 +180,31 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
     for(uli = 0; uli < row_size; uli++) B.push_back(v);
     for(uli = 0; uli < row_size; uli++) {
         for(ulj = 0; ulj < column_size - row_size; ulj++) {
-            B[uli][ulj] = full_rank_matrix[uli][row_size + ulj];
+            B[uli][ulj] = full_rank_matrix[uli][ulj + row_size];
         }
     }
     v.clear();
-    /* initialize L and U */
+    /* initiaize L and U */
     for(uli = 0; uli < row_size; uli++) {
         v.push_back(zero);
     }
     for(uli = 0; uli < row_size; uli++) {
         X.push_back(v);
-        Y.push_back(v);
         I.push_back(v);
     }
-
+    
     for(uli = 0; uli < row_size; uli++) {
         I[uli][uli] = one;
-        Y[uli][uli] = one;
     }
+
+    std::cout << "*** A ***" << std::endl;
+    for(uli = 0; uli < row_size; uli++) {
+        for(ulj = 0; ulj < row_size; ulj++) {
+            std::cout << std::setw(2) << A[uli][ulj] << " ";
+        }
+        std::cout << std::endl;
+    }
+
     /* LU decomposition */
     for(uli = 0; uli < row_size; ++uli){
         // calculating L (i <= j)
@@ -220,20 +225,19 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
             A[uli][ulj] = sum/A[uli][uli];
         }
     }
-    std::cout << "*** LU matrix ***" << std::endl;
+    std::cout << "LU decomposition completed." << std::endl;
+    std::cout << "*** LU ***" << std::endl;
     for(uli = 0; uli < row_size; uli++) {
         for(ulj = 0; ulj < row_size; ulj++) {
-            std::cout << std::setw(2) << A[uli][ulj].value() << " ";
+            std::cout << std::setw(2) << A[uli][ulj] << " ";
         }
         std::cout << std::endl;
     }
-
-    /* Now, get inverse of matrix A */
-     /* forward substitution */
+    /* forward substitution */
     for(ulj = 0; ulj < row_size; ulj++) {
         for(uli = 0; uli < row_size; uli++) {
             sum = I[uli][ulj];
-            for(ulk = 0; ulk < i; ulk++) sum -= A[uli][ulk]*X[ulk][ulj];
+            for(ulk = 0; ulk < uli; ulk++) sum -= A[uli][ulk]*X[ulk][ulj];
             X[uli][ulj] = sum/A[uli][uli];
         }
     }
@@ -263,33 +267,57 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
         std::cout << std::endl;
     }
 
-    /* Now, get generating matrix of parity check matrix */
-    Gdash = gfq_matrix_product(X, B, gf);
-
     v.clear();
-    for(ulj = 0; ulj < column_size - row_size; ulj++) v.push_back(zero);
-    for(uli = 0; uli < column_size; uli++) G.push_back(v);
-
-    for(uli = 0; uli < column_size - row_size; uli++) {
-        for(ulj = 0; ulj < column_size - row_size; ulj++) {
-            G[uli][ulj] = Gdash[uli][ulj];
+    A.clear();
+    for(uli = 0; uli < row_size; uli++) v.push_back(zero);
+    for(uli = 0; uli < row_size; uli++) A.push_back(v);
+    for(uli = 0; uli < row_size; uli++) {
+        for(ulj = 0; ulj < row_size; ulj++) {
+            A[uli][ulj] = full_rank_matrix[uli][ulj];
         }
     }
-    for(uli = 0; uli < column_size - row_size; uli++) G[uli + column_size - row_size][uli] = one;
 
-    std::cout << "**** Generating matrix ****" << std::endl;
-    for(uli = 0; uli < column_size; uli++) {
-        for(ulj = 0; ulj < column_size - row_size; ulj++) {
-            std::cout << std::setw(2) << G[uli][ulj].value() << " ";
+    Y = gfq_matrix_product(X, A, gf);
+    std::cout << "*** Inverse matrix check result ***" << std::endl;
+    for(uli = 0; uli < row_size; uli++) {
+        for(ulj = 0; ulj < row_size; ulj++) {
+            std::cout << std::setw(2) << Y[uli][ulj] << " ";
         }
         std::cout << std::endl;
     }
 
-    P = gfq_matrix_product(full_rank_matrix, G, gf);
-    std::cout << "**** parity check result ****" << std::endl;
-    for(uli = 0; uli < P.size(); uli++) {
-        for(ulj = 0; ulj < P[0].size(); ulj++) {
-            std::cout << std::setw(2) << P[uli][ulj].value() << " ";
+    std::cout << "Inverse matrix calculation completed." << std::endl;
+    G = gfq_matrix_product(X, B, gf);
+
+    /* create complete generating matrix */
+    v.clear();
+    Z.clear();
+    std::cout << "row_size = " << row_size << " column_size = " << column_size << std::endl;
+    for(uli = 0; uli < row_size; uli++) v.push_back(zero);
+    for(uli = 0; uli < column_size; uli++) Z.push_back(v);
+
+    for(uli = 0; uli < row_size; uli++) {
+        for(ulj = 0; ulj < row_size; ulj++) {
+            Z[uli][ulj] = G[uli][ulj];
+        }
+    }
+    for(uli = 0; uli < row_size; uli++) {
+        Z[uli + row_size][uli] = one;
+    } 
+
+    std::cout << "*** transeposed generating matrix ***" << std::endl;
+    for(uli = 0; uli < column_size; uli++) {
+        for(ulj = 0; ulj < row_size; ulj++) {
+            std::cout << std::setw(2) << Z[uli][ulj] << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    X = gfq_matrix_product(full_rank_matrix, Z, gf);
+    std::cout << "*** check result ***" << std::endl;
+    for(uli = 0; uli < X.size(); uli++) {
+        for(ulj = 0; ulj < X[0].size(); ulj++) {
+            std::cout << std::setw(2) << X[uli][ulj] << " ";
         }
         std::cout << std::endl;
     }
