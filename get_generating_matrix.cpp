@@ -129,9 +129,9 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
     std::vector<std::vector<Galois::Element> > full_rank_matrix;
     std::list<std::vector<std::vector<Galois::Element> > > list_of_Q;
     std::vector<Galois::Element> v;
-    Galois::Element lu(gf, 0);
+    Galois::Element sum(gf, 0);
     uint64_t uli, ulj, ulk;
-    int64_t k;
+    int64_t i;
     uint64_t row_size;
     uint64_t column_size;
     bool full_rank;
@@ -203,20 +203,20 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
     for(uli = 0; uli < row_size; ++uli){
         // calculating L (i <= j)
         for(ulj = 0; ulj <= uli; ++ulj){
-            lu = A[uli][ulj];
+            sum = A[uli][ulj];
             for(ulk = 0; ulk < ulj; ++ulk){
-                lu -= A[uli][ulk]*A[ulk][ulj];    // l_ik * u_kj
+                sum -= A[uli][ulk]*A[ulk][ulj];    // l_ik * u_kj
             }
-            A[uli][ulj] = lu;
+            A[uli][ulj] = sum;
         }
  
         // calculating U (i < j)
         for(ulj = uli + 1; ulj < row_size; ++ulj){
-            lu = A[uli][ulj];
+            sum = A[uli][ulj];
             for(ulk = 0; ulk < uli; ++ulk){
-                lu -= A[uli][ulk]*A[ulk][ulj];    // l_ik * u_kj
+                sum -= A[uli][ulk]*A[ulk][ulj];    // l_ik * u_kj
             }
-            A[uli][ulj] = lu/A[uli][uli];
+            A[uli][ulj] = sum/A[uli][uli];
         }
     }
     std::cout << "*** LU matrix ***" << std::endl;
@@ -228,25 +228,40 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
     }
 
     /* Now, get inverse of matrix A */
-    /* forward substitution */
+     /* forward substitution */
     for(ulj = 0; ulj < row_size; ulj++) {
-        for(ulk = 0; ulk < row_size - 1; ulk++) {
-            for(uli = ulk + 1; uli < row_size; ulk++) {
-                Y[uli][ulj] = Y[uli][ulj] - Y[ulk][ulj]*A[uli][ulk];
-            }
+        for(uli = 0; uli < row_size; uli++) {
+            sum = I[uli][ulj];
+            for(ulk = 0; ulk < i; ulk++) sum -= A[uli][ulk]*X[ulk][ulj];
+            X[uli][ulj] = sum/A[uli][uli];
         }
+    }
+    std::cout << "*** Y ***" << std::endl;
+    for(uli = 0; uli < row_size; uli++) {
+        for(ulj = 0; ulj < row_size; ulj++) {
+            std::cout << std::setw(2) << X[uli][ulj] << " ";
+        }
+        std::cout << std::endl;
     }
 
     /* backward substitution */
-    copy(Y.begin(), Y.end(), X.begin());
     for(ulj = 0; ulj < row_size; ulj++) {
-        for(k = row_size - 1; k >=0; k--) {
-            X[k][ulj] = X[k][ulj]/A[k][k];
-            for(uli = 0; (int64_t)uli < k; uli++){
-                X[uli][ulj] = X[uli][ulj] - A[uli][k]*X[k][ulj];
+        for(i = row_size - 1; i >= 0; i--) {
+            sum = X[i][ulj];
+            for(ulk = i + 1; ulk < row_size; ulk++) {
+                sum -= A[uli][ulk]*X[ulk][ulj];
             }
+            X[i][ulj] = sum;
         }
     }
+    std::cout << "*** X ***" << std::endl;
+    for(uli = 0; uli < row_size; uli++) {
+        for(ulj = 0; ulj < row_size; ulj++) {
+            std::cout << std::setw(2) << X[uli][ulj] << " ";
+        }
+        std::cout << std::endl;
+    }
+
     /* Now, get generating matrix of parity check matrix */
     Gdash = gfq_matrix_product(X, B, gf);
     v.clear();
