@@ -123,14 +123,13 @@ bool make_matrix_full_rank(std::vector<std::vector<Galois::Element> >& parity_ch
 std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<std::vector<Galois::Element> >& parity_check_matrix, const Galois::Field* gf) {
     std::vector<std::vector<Galois::Element> > A;
     std::vector<std::vector<Galois::Element> > B;
-    std::vector<std::vector<Galois::Element> > L;
-    std::vector<std::vector<Galois::Element> > U;
     std::vector<std::vector<Galois::Element> > I;
     std::vector<std::vector<Galois::Element> > X, Y;
     std::vector<std::vector<Galois::Element> > G, Gdash;
     std::vector<std::vector<Galois::Element> > full_rank_matrix;
     std::list<std::vector<std::vector<Galois::Element> > > list_of_Q;
     std::vector<Galois::Element> v;
+    Galois::Element lu(gf, 0);
     uint64_t uli, ulj, ulk;
     int64_t k;
     uint64_t row_size;
@@ -139,7 +138,6 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
 
     Galois::Element zero(gf, 0);
     Galois::Element one(gf, 1);
-    Galois::Element sum = zero;
 
     row_size = parity_check_matrix.size();
     column_size = parity_check_matrix[0].size();
@@ -192,8 +190,6 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
         v.push_back(zero);
     }
     for(uli = 0; uli < row_size; uli++) {
-        L.push_back(v);
-        U.push_back(v);
         X.push_back(v);
         Y.push_back(v);
         I.push_back(v);
@@ -201,49 +197,42 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
 
     for(uli = 0; uli < row_size; uli++) {
         I[uli][uli] = one;
-        L[uli][uli] = one;
+        Y[uli][uli] = one;
     }
-
     /* LU decomposition */
+    for(uli = 0; uli < row_size; ++uli){
+        // calculating L (i <= j)
+        for(ulj = 0; ulj <= uli; ++ulj){
+            lu = A[uli][ulj];
+            for(ulk = 0; ulk < ulj; ++ulk){
+                lu -= A[uli][ulk]*A[ulk][ulj];    // l_ik * u_kj
+            }
+            A[uli][ulj] = lu;
+        }
+ 
+        // calculating U (i < j)
+        for(ulj = uli + 1; ulj < row_size; ++ulj){
+            lu = A[uli][ulj];
+            for(ulk = 0; ulk < uli; ++ulk){
+                lu -= A[uli][ulk]*A[ulk][ulj];    // l_ik * u_kj
+            }
+            A[uli][ulj] = lu/A[uli][uli];
+        }
+    }
+    std::cout << "*** LU matrix ***" << std::endl;
     for(uli = 0; uli < row_size; uli++) {
         for(ulj = 0; ulj < row_size; ulj++) {
-            if(uli <= ulj){
-                sum = zero;
-                for(ulk = 0; ulk < uli - 1; uli++) {
-                    sum = sum + L[uli][ulk]*U[ulk][ulj];
-                }
-                U[uli][ulj] = A[uli][ulj] - sum;
-            } else {
-                sum = zero;
-                for(ulk = 0; ulk < ulj - 1; ulk++) {
-                    sum = sum + L[uli][ulk]*U[ulk][ulj];
-                }
-                L[uli][ulj] = (A[uli][ulj] - sum)/U[ulj][ulj];
-            }
-        }
-    }
-    std::cout << "*** L matrix ***" << std::endl;
-    for(uli = 0; uli < row_size; uli++) {
-        for(ulj = 0; ulj < column_size; ulj++) {
-            std::cout << std::setw(2) << L[uli][ulj].value() << " ";
-        }
-        std::cout << std::endl;
-    }
-    std::cout << "*** U matrix ***" << std::endl;
-    for(uli = 0; uli < row_size; uli++) {
-        for(ulj = 0; ulj < column_size; ulj++) {
-            std::cout << std::setw(2) << U[uli][ulj].value() << " ";
+            std::cout << std::setw(2) << A[uli][ulj].value() << " ";
         }
         std::cout << std::endl;
     }
 
     /* Now, get inverse of matrix A */
     /* forward substitution */
-    copy(I.begin(), I.end(), Y.begin());
     for(ulj = 0; ulj < row_size; ulj++) {
         for(ulk = 0; ulk < row_size - 1; ulk++) {
             for(uli = ulk + 1; uli < row_size; ulk++) {
-                Y[uli][ulj] = Y[uli][ulj] - Y[ulk][ulj]*L[uli][ulk];
+                Y[uli][ulj] = Y[uli][ulj] - Y[ulk][ulj]*A[uli][ulk];
             }
         }
     }
@@ -252,9 +241,9 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
     copy(Y.begin(), Y.end(), X.begin());
     for(ulj = 0; ulj < row_size; ulj++) {
         for(k = row_size - 1; k >=0; k--) {
-            X[k][ulj] = X[k][ulj]/U[k][k];
-            for(uli = 0; uli < k; uli++){
-                X[uli][ulj] = X[uli][ulj] - U[uli][k]*X[k][ulj];
+            X[k][ulj] = X[k][ulj]/A[k][k];
+            for(uli = 0; (int64_t)uli < k; uli++){
+                X[uli][ulj] = X[uli][ulj] - A[uli][k]*X[k][ulj];
             }
         }
     }
