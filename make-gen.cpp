@@ -19,6 +19,7 @@
 #include <cstdlib>
 #include <vector>
 #include <string>
+#include <iomanip>
 #include <galois++/array2d.h>
 #include <galois++/element.h>
 #include <galois++/field.h>
@@ -33,32 +34,45 @@ extern std::vector<std::vector<Galois::Element> > make_generating_matrix(std::ve
 int main(int argc, char* argv[]) {
     std::ifstream ifs;
     std::ofstream ofs;
-    std::vector<std::vector<Galois::Element> > G, H;
+    std::vector<std::vector<Galois::Element> > G;
+    std::vector<std::vector<Galois::Element> > H;
+    std::vector<std::vector<uint64_t> > Hdash;
     uint64_t characteristic;
     generating_matrix g;
     uint64_t number_of_rows, number_of_columns;
     uint64_t uli, ulj;
     msgpack::sbuffer buf;
+    std::vector<Galois::Element> v;
     
     if(argc != 3) {
         std::cerr << "Usage: " << argv[0] << " <GF(q) alist file name> <generating matrix file name>" << std::endl;
         return(EXIT_FAILURE);
     }
     gfq_alist alist = gfq_alist(argv[1]);
-    std::cout << "q = " << alist.characteristic << std::endl;
-    return(EXIT_FAILURE);
     characteristic = alist.characteristic;
     const Galois::Field gf(characteristic);
-    H = alist.make_dense();
+    Galois::Element zero(&gf, 0);
+    Hdash = alist.make_dense();
+    for(uli = 0; uli < alist.number_of_columns; uli++) v.push_back(zero);
+    for(uli = 0; uli < alist.number_of_rows; uli++) H.push_back(v);
+    for(uli = 0; uli < alist.number_of_rows; uli++) {
+        for(ulj = 0; ulj < alist.number_of_columns; ulj++) {
+            H[uli][ulj].setValue(Hdash[uli][ulj]);
+        }
+    } 
+    std::cout << "parity check (dense form) is generated." << std::endl;
     G = make_generating_matrix(H, &gf);
+    std::cout << "generating matrix is calculated" << std::endl;
     number_of_rows = G.size();
     number_of_columns = G[0].size();
     std::vector<std::vector<uint64_t> > g_contents(number_of_rows, std::vector<uint64_t>(number_of_columns, 0));
 
     for(uli = 0; uli < number_of_rows; uli++) {
         for(ulj = 0; ulj < number_of_columns; ulj++) {
-            g_contents[uli][ulj] = G[uli][ulj].value();
+            g_contents[uli][ulj] = (uint64_t)G[uli][ulj].value();
+            std::cout << std::setw(2) << g_contents[uli][ulj] << " ";
         }
+        std::cout << std::endl;
     }
 
     g.characteristic = characteristic;

@@ -77,13 +77,12 @@ bool make_matrix_full_rank(std::vector<std::vector<Galois::Element> >& parity_ch
     Galois::Element zero(gf, 0);
     Galois::Element one(gf, 1);
     std::list<std::vector<std::vector<Galois::Element> > > permutation_matrices;
-    std::vector<Galois::Element> v;
+    std::vector<Galois::Element> v, tmp;
     std::vector<std::vector<Galois::Element> > Q;
     bool found_flag = false;
 
     /* preparation */
-    for(uli = 0; uli < row_size; uli++) v.push_back(zero);
-    v.clear();
+    for(uli = 0; uli < row_size; uli++) tmp.push_back(zero);
     for(ulj = 0; ulj < column_size; ulj++) v.push_back(zero);
     for(ulj = 0; ulj < column_size; ulj++) Q.push_back(v);
 
@@ -94,13 +93,13 @@ bool make_matrix_full_rank(std::vector<std::vector<Galois::Element> >& parity_ch
             if(parity_check_matrix[uli][ulj] != zero) { /* if uli-th row ulj-column element does not equal to zero */
                 /* column swap */
                 for(ulk = 0; ulk < row_size; ulk++) { 
-                    v[ulk] = parity_check_matrix[ulk][uli];
+                    tmp[ulk] = parity_check_matrix[ulk][uli];
                 }
                 for(ulk = 0; ulk < row_size; ulk++) { 
                     parity_check_matrix[ulk][uli] = parity_check_matrix[ulk][ulj];
                 }
                 for(ulk = 0; ulk < row_size; ulk++) { 
-                    parity_check_matrix[ulk][ulj] = v[ulk];
+                    parity_check_matrix[ulk][ulj] = tmp[ulk];
                 }
                 clear_matrix(Q, gf);
                 for(ulk = 0; ulk < uli; ulk++) Q[ulk][ulk] = one;
@@ -144,7 +143,6 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
 
     row_size = parity_check_matrix.size();
     column_size = parity_check_matrix[0].size();
-    std::cout << "row = " << row_size << ", " << column_size << std::endl;
     std::cout << "*** parity check matrix ***" << std::endl;
     for(uli = 0; uli < row_size; uli++) {
         for(ulj = 0; ulj < column_size; ulj++) {
@@ -153,6 +151,9 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
         std::cout << std::endl;
     }
 
+    v.clear();
+    for(uli = 0; uli < parity_check_matrix[0].size(); uli++) v.push_back(zero);
+    for(uli = 0; uli < parity_check_matrix.size(); uli++) full_rank_matrix.push_back(v);
     copy(parity_check_matrix.begin(), parity_check_matrix.end(), full_rank_matrix.begin());
     full_rank = make_matrix_full_rank(full_rank_matrix, list_of_Q, gf);
     if(full_rank == false) {
@@ -167,6 +168,7 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
         std::cout << std::endl;
     }
 
+    v.clear();
     /* create square matrix A */
     for(uli = 0; uli < row_size; uli++) v.push_back(zero);
     for(uli = 0; uli < row_size; uli++) A.push_back(v);
@@ -197,12 +199,10 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
         I.push_back(v);
     }
 
-
     for(uli = 0; uli < row_size; uli++) {
         I[uli][uli] = one;
+        L[uli][uli] = one;
     }
-
-    copy(I.begin(), I.end(), L.begin());
 
     /* LU decomposition */
     for(uli = 0; uli < row_size; uli++) {
