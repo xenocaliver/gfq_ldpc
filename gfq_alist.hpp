@@ -31,6 +31,24 @@
 #include <galois++/primes.h>
 #include <boost/algorithm/string.hpp>  // for split function
 
+std::vector<std::string> split(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    std::string item;
+    for (char ch: s) {
+        if (ch == delim) {
+            if (!item.empty())
+                elems.push_back(item);
+            item.clear();
+        }
+        else {
+            item += ch;
+        }
+    }
+    if (!item.empty())
+        elems.push_back(item);
+    return elems;
+}
+
 class gfq_alist {
 public:
     uint64_t number_of_columns;
@@ -40,9 +58,8 @@ public:
     uint64_t max_row_weight;
     std::vector<uint64_t> nwlist;
     std::vector<uint64_t> mwlist;
-    std::vector<std::vector<std::pair<uint64_t, Galois::Element> > > nlist;
-    std::vector<std::vector<std::pair<uint64_t, Galois::Element> > > mlist;
-    std::string zero_string = "0";
+    std::vector<std::vector<std::pair<uint64_t, uint64_t> > > nlist;
+    std::vector<std::vector<std::pair<uint64_t, uint64_t> > > mlist;
 
     /* constructors */
     gfq_alist(void) : number_of_columns(0), number_of_rows(0), characteristic(0), max_column_weight(0), max_row_weight(0) {}
@@ -65,87 +82,92 @@ public:
 
     int gfq_parse_alist(std::ifstream& ifs) {
         std::string line;
-        std::vector<std::string> v;
+        std::vector<std::string> v, w;
         std::vector<std::string>::iterator vit;
-        uint64_t uli, ulj;
-        std::vector<std::pair<uint64_t, Galois::Element> > ev;
+        uint64_t uli, ulj, ulk;
+        std::vector<std::pair<uint64_t, uint64_t> > ev;
+        std::string zero("0");
 
         getline(ifs, line);
-        boost::algorithm::split(v, line, boost::is_space());           /* split by empty string */
+        v = split(line, ' ');           /* split by empty string */
         if(v.size() != 3) {
             std::cerr << "Invalid ALIST FILE" << std::endl;
             return(-1);
         }
-        this->number_of_columns = std::stoi(v[0]);
-        this->number_of_rows = std::stoi(v[1]);
-        this->characteristic = std::stoi(v[2]);
-        Galois::Field gf(this->characteristic);
-        Galois::Element gfe = Galois::Element(&gf, 0);
-        std::pair<uint64_t, Galois::Element> e(0, gfe);
+        try {
+            this->number_of_columns = std::stoull(v[0], nullptr, 10);
+            this->number_of_rows = std::stoull(v[1], nullptr, 10);
+            this->characteristic = std::stoull(v[2], nullptr, 10);
+        } catch(std::invalid_argument e) {
+            std::cerr << e.what() << std::endl;
+            return(-1);
+        }
+        std::pair<uint64_t, uint64_t> pos(0, 0);
         getline(ifs, line);
-        boost::algorithm::split(v, line, boost::is_space());
+        v = split(line, ' ');
         if(v.size() != 2) {
             std::cerr << "Invalid ALIST FILE" << std::endl;
             return(-1);
         }
-        this->max_column_weight = std::stoi(v[0]);
-        this->max_row_weight = std::stoi(v[1]);
-
-        getline(ifs, line);
-        boost::algorithm::split(v, line, boost::is_space());
-        for(vit = v.begin(); vit != v.end(); ++vit) {
-            this->nwlist.push_back(std::stoi(*vit));
+        try {
+            this->max_column_weight = std::stoull(v[0], nullptr, 10);
+            this->max_row_weight = std::stoull(v[1], nullptr, 10);
+        } catch(std::invalid_argument e) {
+            std::cerr << e.what() << std::endl;
+            return(-1);
         }
 
         getline(ifs, line);
-        boost::algorithm::split(v, line, boost::is_space());
+        boost::trim(line);
+        v = split(line, ' ');
         for(vit = v.begin(); vit != v.end(); ++vit) {
-            this->mwlist.push_back(std::stoi(*vit));
+            this->nwlist.push_back(std::stoull(*vit, nullptr, 10));
+        }
+
+        getline(ifs, line);
+        boost::trim(line);
+        v = split(line, ' ');
+        for(vit = v.begin(); vit != v.end(); ++vit) {
+            this->mwlist.push_back(std::stoull(*vit, nullptr, 10));
         }
 
         this->nlist.resize(this->number_of_columns);
         for(uli = 0; uli < this->number_of_columns; uli++) {
             getline(ifs, line);
-            boost::algorithm::split(v, line, boost::is_any_of("\t "), boost::token_compress_on);
-            for(ulj = 0; ulj < v.size(); ulj += 2){
-                if(v[ulj + 1] == zero_string) continue; 
-                e.first = std::stoi(v[ulj]);
-                gfe.setValue(std::stoi(v[ulj + 1]));
-                e.second = gfe;
-                this->nlist[uli].push_back(e);
+            v = split(line, ' ');
+            for(ulj = 0; ulj < v.size(); ulj++){
+                for(ulk = 0; ulk < v.size(); ulk += 2) {
+                    if(v[ulk + 1] == zero) continue;
+                    pos.first = std::stoull(v[ulk], nullptr, 10);
+                    pos.second = std::stoull(v[ulk + 1], nullptr, 10);
+                    this->nlist[uli].push_back(pos);
+                }
             }
         }
 
         this->mlist.resize(this->number_of_rows);
-       for(uli = 0; uli < this->number_of_rows; uli++) {
+        for(uli = 0; uli < this->number_of_rows; uli++) {
             getline(ifs, line);
-            boost::algorithm::split(v, line, boost::is_any_of("\t "), boost::token_compress_on);
-            for(ulj = 0; ulj < v.size(); ulj += 2){
-                if(v[ulj + 1] == zero_string) continue; 
-                e.first = std::stoi(v[ulj]);
-                gfe.setValue(std::stoi(v[ulj + 1]));
-                e.second = gfe;
-                this->mlist[uli].push_back(e);
+            v = split(line, ' ');
+            for(ulj = 0; ulj < v.size(); ulj++){
+                for(ulk = 0; ulk < v.size(); ulk += 2) {
+                    if(v[ulk + 1] == zero) continue;
+                    pos.first = std::stoull(v[ulk], nullptr, 10);
+                    pos.second = std::stoull(v[ulk + 1], nullptr, 10);
+                    this->mlist[uli].push_back(pos);
+                }
             }
         }
         return(1);
     } 
 
-    std::vector<std::vector<Galois::Element> > make_dense(void) {
+    std::vector<std::vector<uint64_t> > make_dense(void) {
+        uint64_t uli;
+        std::vector<std::vector<uint64_t> > H(this->number_of_rows, std::vector<uint64_t>(this->number_of_columns, 0));
+        std::vector<uint64_t> v;
+        std::vector<std::pair<uint64_t, uint64_t> >::iterator vit;
+
         Galois::Field gf(this->characteristic);
-        Galois::Element zero(&gf, 0);
-        uint64_t uli, ulj;
-        std::vector<std::vector<Galois::Element> > H;
-        std::vector<Galois::Element> v;
-        std::vector<std::pair<uint64_t, Galois::Element> >::iterator vit;
-
-        for(ulj = 0; ulj < this->number_of_columns; ulj++) {
-            v.push_back(zero);
-        }
-        for(uli = 0; uli < this->number_of_rows; uli++) {
-            H.push_back(v);
-        }
-
         for(uli = 0; uli < this->number_of_rows; uli++) {
             for(vit = this->mlist[uli].begin(); vit != this->mlist[uli].end(); ++vit) {
                 H[uli][vit->first - 1] = vit->second;
