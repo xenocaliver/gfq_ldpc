@@ -17,7 +17,9 @@
 #include <iostream>
 #include <cstdlib>
 #include <vector>
+#include <list>
 #include <cstdint>
+#include <iomanip>
 #include <galois++/array2d.h>
 #include <galois++/element.h>
 #include <galois++/field.h>
@@ -55,6 +57,70 @@ std::vector<std::vector<Galois::Element> > gfq_matrix_product(std::vector<std::v
     return(C);
 }
 
+void clear_matrix(std::vector<std::vector<Galois::Element> >& M, const Galois::Field* gf) {
+    uint64_t uli, ulj;
+    Galois::Element zero(gf, 0);
+    uint64_t row_size = M.size();
+    uint64_t column_size = M[0].size();
+    
+    for(uli = 0; uli < row_size; uli++) {
+        for(ulj = 0; ulj < column_size; ulj++) {
+            M[uli][ulj] = zero;
+        }
+    }
+}
+
+bool make_matrix_full_rank(std::vector<std::vector<Galois::Element> >& parity_check_matrix, std::list<std::vector<std::vector<Galois::Element> > > list_of_Q, const Galois::Field* gf) {
+    uint64_t uli, ulj, ulk;
+    uint64_t row_size = parity_check_matrix.size();
+    uint64_t column_size = parity_check_matrix[0].size();
+    Galois::Element zero(gf, 0);
+    Galois::Element one(gf, 1);
+    std::list<std::vector<std::vector<Galois::Element> > > permutation_matrices;
+    std::vector<Galois::Element> v;
+    std::vector<std::vector<Galois::Element> > Q;
+    bool found_flag = false;
+
+    /* preparation */
+    for(uli = 0; uli < row_size; uli++) v.push_back(zero);
+    v.clear();
+    for(ulj = 0; ulj < column_size; ulj++) v.push_back(zero);
+    for(ulj = 0; ulj < column_size; ulj++) Q.push_back(v);
+
+    for(uli = 0; uli < row_size; uli++) {
+        if(parity_check_matrix[uli][uli] != zero) continue;
+        found_flag = false;
+        for(ulj = uli + 1; ulj < column_size; ulj++) {
+            if(parity_check_matrix[uli][ulj] != zero) { /* if uli-th row ulj-column element does not equal to zero */
+                /* column swap */
+                for(ulk = 0; ulk < row_size; ulk++) { 
+                    v[ulk] = parity_check_matrix[ulk][uli];
+                }
+                for(ulk = 0; ulk < row_size; ulk++) { 
+                    parity_check_matrix[ulk][uli] = parity_check_matrix[ulk][ulj];
+                }
+                for(ulk = 0; ulk < row_size; ulk++) { 
+                    parity_check_matrix[ulk][ulj] = v[ulk];
+                }
+                clear_matrix(Q, gf);
+                for(ulk = 0; ulk < uli; ulk++) Q[ulk][ulk] = one;
+                Q[uli][ulj] = one;
+                for(ulk = uli + 1; ulk < ulj; ulk++) Q[ulk][ulk] = one;
+                Q[ulj][uli] = one;
+                for(ulk = ulj + 1; ulk < column_size; ulk++) Q[ulk][ulk] = one;
+                permutation_matrices.push_back(Q);
+                found_flag = true;
+                break;
+            }
+        }
+        if(found_flag == false) {
+            std::cerr << "This matrix may be singular." << std::endl;
+            return(found_flag);
+        }
+    }
+    list_of_Q = permutation_matrices;
+    return(true);
+}
 std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<std::vector<Galois::Element> >& parity_check_matrix, const Galois::Field* gf) {
     std::vector<std::vector<Galois::Element> > A;
     std::vector<std::vector<Galois::Element> > B;
@@ -62,32 +128,75 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
     std::vector<std::vector<Galois::Element> > U;
     std::vector<std::vector<Galois::Element> > I;
     std::vector<std::vector<Galois::Element> > X, Y;
-    std::vector<std::vector<Galois::Element> > G;
+    std::vector<std::vector<Galois::Element> > G, Gdash;
+    std::vector<std::vector<Galois::Element> > full_rank_matrix;
+    std::list<std::vector<std::vector<Galois::Element> > > list_of_Q;
     std::vector<Galois::Element> v;
     uint64_t uli, ulj, ulk;
+    int64_t k;
     uint64_t row_size;
+    uint64_t column_size;
+    bool full_rank;
 
     Galois::Element zero(gf, 0);
     Galois::Element one(gf, 1);
     Galois::Element sum = zero;
 
-    row_size = parity_check_matrix[0].size();
+    row_size = parity_check_matrix.size();
+    column_size = parity_check_matrix[0].size();
+    std::cout << "row = " << row_size << ", " << column_size << std::endl;
+    std::cout << "*** parity check matrix ***" << std::endl;
+    for(uli = 0; uli < row_size; uli++) {
+        for(ulj = 0; ulj < column_size; ulj++) {
+            std::cout << std::setw(2) << parity_check_matrix[uli][ulj].value() << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    copy(parity_check_matrix.begin(), parity_check_matrix.end(), full_rank_matrix.begin());
+    full_rank = make_matrix_full_rank(full_rank_matrix, list_of_Q, gf);
+    if(full_rank == false) {
+        std::cerr << "This matrix may be singular." << std::endl;
+        exit(-1);
+    }
+    std::cout << "*** full rank parity check matrix ***" << std::endl;
+    for(uli = 0; uli < row_size; uli++) {
+        for(ulj = 0; ulj < column_size; ulj++) {
+            std::cout << std::setw(2) << full_rank_matrix[uli][ulj].value() << " ";
+        }
+        std::cout << std::endl;
+    }
 
     /* create square matrix A */
-    for(uli = 0; uli < row_size; uli++) A.push_back(parity_check_matrix[uli]);
+    for(uli = 0; uli < row_size; uli++) v.push_back(zero);
+    for(uli = 0; uli < row_size; uli++) A.push_back(v);
+    for(uli = 0; uli < row_size; uli++) {
+        for(ulj = 0; ulj < row_size; ulj++) {
+            A[uli][ulj] = full_rank_matrix[uli][ulj];
+        }
+    }
+    v.clear();
     /* create residual part matrix B */
-    for(uli = row_size; uli < parity_check_matrix.size(); uli++) B.push_back(parity_check_matrix[uli]);
+    for(uli = 0; uli < column_size - row_size; uli++) v.push_back(zero);
+    for(uli = 0; uli < row_size; uli++) B.push_back(v);
+    for(uli = 0; uli < row_size; uli++) {
+        for(ulj = 0; ulj < column_size - row_size; ulj++) {
+            B[uli][ulj] = full_rank_matrix[uli][row_size + ulj];
+        }
+    }
+    v.clear();
     /* initialize L and U */
     for(uli = 0; uli < row_size; uli++) {
         v.push_back(zero);
     }
     for(uli = 0; uli < row_size; uli++) {
         L.push_back(v);
+        U.push_back(v);
+        X.push_back(v);
+        Y.push_back(v);
+        I.push_back(v);
     }
 
-    std::copy(L.begin(), L.end(), U.begin());
-    std::copy(L.begin(), L.end(), X.begin());
-    std::copy(L.begin(), L.end(), Y.begin());
 
     for(uli = 0; uli < row_size; uli++) {
         I[uli][uli] = one;
@@ -113,6 +222,20 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
             }
         }
     }
+    std::cout << "*** L matrix ***" << std::endl;
+    for(uli = 0; uli < row_size; uli++) {
+        for(ulj = 0; ulj < column_size; ulj++) {
+            std::cout << std::setw(2) << L[uli][ulj].value() << " ";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << "*** U matrix ***" << std::endl;
+    for(uli = 0; uli < row_size; uli++) {
+        for(ulj = 0; ulj < column_size; ulj++) {
+            std::cout << std::setw(2) << U[uli][ulj].value() << " ";
+        }
+        std::cout << std::endl;
+    }
 
     /* Now, get inverse of matrix A */
     /* forward substitution */
@@ -125,17 +248,24 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
         }
     }
 
-    /* backword substitution */
+    /* backward substitution */
     copy(Y.begin(), Y.end(), X.begin());
     for(ulj = 0; ulj < row_size; ulj++) {
-        for(ulk = row_size - 1; ulk >=0; ulk--) {
-            X[ulk][ulj] = X[ulk][ulj]/U[ulk][ulk];
-            for(uli = 0; uli < ulk; uli++){
-                X[uli][ulj] = X[uli][ulj] - U[uli][ulk]*X[ulk][ulj];
+        for(k = row_size - 1; k >=0; k--) {
+            X[k][ulj] = X[k][ulj]/U[k][k];
+            for(uli = 0; uli < k; uli++){
+                X[uli][ulj] = X[uli][ulj] - U[uli][k]*X[k][ulj];
             }
         }
     }
     /* Now, get generating matrix of parity check matrix */
-    G = gfq_matrix_product(X, B, gf);
+    Gdash = gfq_matrix_product(X, B, gf);
+    v.clear();
+    for(uli = 0; uli < Gdash.size(); uli++) {
+        for(ulj = 0; ulj < Gdash[0].size(); ulj++) {
+            std::cout << Gdash[uli][ulj].value() << " ";
+        }
+        std::cout << std::endl;
+    }
     return(G);
 }

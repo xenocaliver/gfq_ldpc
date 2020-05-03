@@ -36,7 +36,6 @@ int main(int argc, char* argv[]) {
     std::vector<std::vector<Galois::Element> > G, H;
     uint64_t characteristic;
     generating_matrix g;
-    const Galois::Field* gf;
     uint64_t number_of_rows, number_of_columns;
     uint64_t uli, ulj;
     msgpack::sbuffer buf;
@@ -46,10 +45,12 @@ int main(int argc, char* argv[]) {
         return(EXIT_FAILURE);
     }
     gfq_alist alist = gfq_alist(argv[1]);
+    std::cout << "q = " << alist.characteristic << std::endl;
+    return(EXIT_FAILURE);
     characteristic = alist.characteristic;
+    const Galois::Field gf(characteristic);
     H = alist.make_dense();
-    gf = H[0][0].field();
-    G = make_generating_matrix(H, gf);
+    G = make_generating_matrix(H, &gf);
     number_of_rows = G.size();
     number_of_columns = G[0].size();
     std::vector<std::vector<uint64_t> > g_contents(number_of_rows, std::vector<uint64_t>(number_of_columns, 0));

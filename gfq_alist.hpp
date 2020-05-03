@@ -69,7 +69,6 @@ public:
         std::vector<std::string>::iterator vit;
         uint64_t uli, ulj;
         std::vector<std::pair<uint64_t, Galois::Element> > ev;
-        Galois::Field gf(0);
 
         getline(ifs, line);
         boost::algorithm::split(v, line, boost::is_space());           /* split by empty string */
@@ -80,7 +79,7 @@ public:
         this->number_of_columns = std::stoi(v[0]);
         this->number_of_rows = std::stoi(v[1]);
         this->characteristic = std::stoi(v[2]);
-        gf.resize(this->characteristic);
+        Galois::Field gf(this->characteristic);
         Galois::Element gfe = Galois::Element(&gf, 0);
         std::pair<uint64_t, Galois::Element> e(0, gfe);
         getline(ifs, line);
