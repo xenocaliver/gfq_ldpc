@@ -142,6 +142,7 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
 
     row_size = parity_check_matrix.size();
     column_size = parity_check_matrix[0].size();
+#ifdef DEBUG
     std::cout << "*** parity check matrix ***" << std::endl;
     for(uli = 0; uli < row_size; uli++) {
         for(ulj = 0; ulj < column_size; ulj++) {
@@ -149,6 +150,7 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
         }
         std::cout << std::endl;
     }
+#endif
 
     v.clear();
     for(uli = 0; uli < parity_check_matrix[0].size(); uli++) v.push_back(zero);
@@ -159,6 +161,7 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
         std::cerr << "This matrix may be singular." << std::endl;
         exit(-1);
     }
+#ifdef DEBUG
     std::cout << "*** full rank parity check matrix ***" << std::endl;
     for(uli = 0; uli < row_size; uli++) {
         for(ulj = 0; ulj < column_size; ulj++) {
@@ -166,6 +169,7 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
         }
         std::cout << std::endl;
     }
+#endif
     v.clear();
     for(uli = 0; uli < row_size; uli++) v.push_back(zero);
     for(uli = 0; uli < row_size; uli++) A.push_back(v);
@@ -197,6 +201,7 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
         I[uli][uli] = one;
     }
 
+#ifdef DEBUG
     std::cout << "*** A ***" << std::endl;
     for(uli = 0; uli < row_size; uli++) {
         for(ulj = 0; ulj < row_size; ulj++) {
@@ -204,7 +209,7 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
         }
         std::cout << std::endl;
     }
-
+#endif
     /* LU decomposition */
     for(uli = 0; uli < row_size; ++uli){
         // calculating L (i <= j)
@@ -225,6 +230,7 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
             A[uli][ulj] = sum/A[uli][uli];
         }
     }
+#ifdef DEBUG
     std::cout << "LU decomposition completed." << std::endl;
     std::cout << "*** LU ***" << std::endl;
     for(uli = 0; uli < row_size; uli++) {
@@ -233,6 +239,7 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
         }
         std::cout << std::endl;
     }
+#endif
     /* forward substitution */
     for(ulj = 0; ulj < row_size; ulj++) {
         for(uli = 0; uli < row_size; uli++) {
@@ -241,6 +248,7 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
             X[uli][ulj] = sum/A[uli][uli];
         }
     }
+#ifdef DEBUG
     std::cout << "*** Y ***" << std::endl;
     for(uli = 0; uli < row_size; uli++) {
         for(ulj = 0; ulj < row_size; ulj++) {
@@ -248,6 +256,7 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
         }
         std::cout << std::endl;
     }
+#endif
 
     /* backward substitution */
     for(ulj = 0; ulj < row_size; ulj++) {
@@ -259,6 +268,7 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
             X[i][ulj] = sum;
         }
     }
+#ifdef DEBUG
     std::cout << "*** X ***" << std::endl;
     for(uli = 0; uli < row_size; uli++) {
         for(ulj = 0; ulj < row_size; ulj++) {
@@ -266,6 +276,7 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
         }
         std::cout << std::endl;
     }
+#endif
 
     v.clear();
     A.clear();
@@ -278,6 +289,16 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
     }
 
     Y = gfq_matrix_product(X, A, gf);
+    bool result = false;
+    for(uli = 0; uli < row_size; uli++) {
+        for(ulj = 0; ulj < row_size; ulj++) {
+            if(Y[uli][ulj] != I[uli][ulj]) {
+                std::cerr << "Inverse matrix is not correct." << std::endl;
+                exit(-1);
+            }
+        }
+    }
+#ifdef DEBUG
     std::cout << "*** Inverse matrix check result ***" << std::endl;
     for(uli = 0; uli < row_size; uli++) {
         for(ulj = 0; ulj < row_size; ulj++) {
@@ -285,14 +306,16 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
         }
         std::cout << std::endl;
     }
-
     std::cout << "Inverse matrix calculation completed." << std::endl;
+#endif
     G = gfq_matrix_product(X, B, gf);
 
     /* create complete generating matrix */
     v.clear();
     Z.clear();
+#ifdef DEBUG
     std::cout << "row_size = " << row_size << " column_size = " << column_size << std::endl;
+#endif
     for(uli = 0; uli < row_size; uli++) v.push_back(zero);
     for(uli = 0; uli < column_size; uli++) Z.push_back(v);
 
@@ -305,6 +328,7 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
         Z[uli + row_size][uli] = one;
     } 
 
+#ifdef DEBUG
     std::cout << "*** transeposed generating matrix ***" << std::endl;
     for(uli = 0; uli < column_size; uli++) {
         for(ulj = 0; ulj < row_size; ulj++) {
@@ -312,8 +336,10 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
         }
         std::cout << std::endl;
     }
+#endif
 
     X = gfq_matrix_product(full_rank_matrix, Z, gf);
+#ifdef DEBUG
     std::cout << "*** check result ***" << std::endl;
     for(uli = 0; uli < X.size(); uli++) {
         for(ulj = 0; ulj < X[0].size(); ulj++) {
@@ -321,6 +347,7 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
         }
         std::cout << std::endl;
     }
+#endif
 
     /* column permutation matrix */
     v.clear();
@@ -331,27 +358,41 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
     std::list<std::vector<std::vector<Galois::Element> > >::iterator qit;
     Q = I;
     for(qit = list_of_Q.begin(); qit != list_of_Q.end(); ++qit) {
+#ifdef DEBUG
         X = *qit;
         std::cout << "*** permutation matrix ***" << std::endl;
+#endif
         Q = gfq_matrix_product(Q, *qit, gf);
+#ifdef DEBUG
         for(uli = 0; uli < X.size(); uli++) {
             for(ulj = 0; ulj < X[0].size(); ulj++) {
                 std::cout << std::setw(2) << X[uli][ulj] << " ";
             }
             std::cout << std::endl;
         }
+#endif
     }
 
     G = gfq_matrix_product(Q, Z, gf);
 
     /* final check */
     X = gfq_matrix_product(parity_check_matrix, G, gf);
+#ifdef DEBUG
     std::cout << "*** final check result ***" << std::endl;
     for(uli = 0; uli < X.size(); uli++) {
         for(ulj = 0; ulj < X[0].size(); ulj++) {
             std::cout << std::setw(2) << X[uli][ulj] << " ";
         }
         std::cout << std::endl;
+    }
+#endif
+    for(uli = 0; uli < X.size(); uli++) {
+        for(ulj = 0; ulj < X[0].size(); ulj++) {
+            if(X[uli][ulj] != zero) {
+                std::cerr << "Incorrect generating matrix." << std::endl;
+                exit(-1);
+            }
+        }
     }
 
     return(G);
