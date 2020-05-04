@@ -71,7 +71,7 @@ void clear_matrix(std::vector<std::vector<Galois::Element> >& M, const Galois::F
     }
 }
 
-bool make_matrix_full_rank(std::vector<std::vector<Galois::Element> >& parity_check_matrix, std::list<std::vector<std::vector<Galois::Element> > > list_of_Q, const Galois::Field* gf) {
+bool make_matrix_full_rank(std::vector<std::vector<Galois::Element> >& parity_check_matrix, std::list<std::vector<std::vector<Galois::Element> > >& list_of_Q, const Galois::Field* gf) {
     uint64_t uli, ulj, ulk;
     uint64_t row_size = parity_check_matrix.size();
     uint64_t column_size = parity_check_matrix[0].size();
@@ -125,7 +125,7 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
     std::vector<std::vector<Galois::Element> > A;
     std::vector<std::vector<Galois::Element> > B;
     std::vector<std::vector<Galois::Element> > I;
-    std::vector<std::vector<Galois::Element> > X, Y, Z, P;
+    std::vector<std::vector<Galois::Element> > X, Y, Z, P, Q;
     std::vector<std::vector<Galois::Element> > G, Gdash;
     std::vector<std::vector<Galois::Element> > full_rank_matrix;
     std::list<std::vector<std::vector<Galois::Element> > > list_of_Q;
@@ -298,7 +298,7 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
 
     for(uli = 0; uli < row_size; uli++) {
         for(ulj = 0; ulj < row_size; ulj++) {
-            Z[uli][ulj] = G[uli][ulj];
+            Z[uli][ulj] = -G[uli][ulj];
         }
     }
     for(uli = 0; uli < row_size; uli++) {
@@ -315,6 +315,38 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
 
     X = gfq_matrix_product(full_rank_matrix, Z, gf);
     std::cout << "*** check result ***" << std::endl;
+    for(uli = 0; uli < X.size(); uli++) {
+        for(ulj = 0; ulj < X[0].size(); ulj++) {
+            std::cout << std::setw(2) << X[uli][ulj] << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    /* column permutation matrix */
+    v.clear();
+    I.clear();
+    for(uli = 0; uli < column_size; uli++) v.push_back(zero);
+    for(uli = 0; uli < column_size; uli++) I.push_back(v);
+    for(uli = 0; uli < column_size; uli++) I[uli][uli] = one;
+    std::list<std::vector<std::vector<Galois::Element> > >::iterator qit;
+    Q = I;
+    for(qit = list_of_Q.begin(); qit != list_of_Q.end(); ++qit) {
+        X = *qit;
+        std::cout << "*** permutation matrix ***" << std::endl;
+        Q = gfq_matrix_product(Q, *qit, gf);
+        for(uli = 0; uli < X.size(); uli++) {
+            for(ulj = 0; ulj < X[0].size(); ulj++) {
+                std::cout << std::setw(2) << X[uli][ulj] << " ";
+            }
+            std::cout << std::endl;
+        }
+    }
+
+    G = gfq_matrix_product(Q, Z, gf);
+
+    /* final check */
+    X = gfq_matrix_product(parity_check_matrix, G, gf);
+    std::cout << "*** final check result ***" << std::endl;
     for(uli = 0; uli < X.size(); uli++) {
         for(ulj = 0; ulj < X[0].size(); ulj++) {
             std::cout << std::setw(2) << X[uli][ulj] << " ";
