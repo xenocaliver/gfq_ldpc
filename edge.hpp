@@ -14,18 +14,21 @@
  * You should have received a copy of the GNU General Public License 
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-#ifndef GENERATING_MATRIX_HPP_
-#define GENERATING_MATRIX_HPP_
+#ifndef EDGE_HPP_
+#define EDGE_HPP_
+#include <cstdlib>
 #include <cstdint>
 #include <vector>
-#include <msgpack.hpp>
 
-class generating_matrix {
+class edge {
 public:
-    uint64_t characteristic;
-    std::vector<std::vector<uint64_t> > contents;
-    generating_matrix(void){}
-    MSGPACK_DEFINE(characteristic, contents);
+    uint64_t ID;
+    std::vector<double> factor_to_variable_message;
+    std::vector<double> variable_to_factor_message;
+
+    /* default constructor */
+    edge(void) : ID(0) {}
+    edge(uint64_t id) : ID(id) {}
 };
+
 #endif

@@ -289,7 +289,6 @@ std::vector<std::vector<Galois::Element> > make_generating_matrix(std::vector<st
     }
 
     Y = gfq_matrix_product(X, A, gf);
-    bool result = false;
     for(uli = 0; uli < row_size; uli++) {
         for(ulj = 0; ulj < row_size; ulj++) {
             if(Y[uli][ulj] != I[uli][ulj]) {

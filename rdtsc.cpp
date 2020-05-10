@@ -14,18 +14,10 @@
  * You should have received a copy of the GNU General Public License 
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-#ifndef GENERATING_MATRIX_HPP_
-#define GENERATING_MATRIX_HPP_
 #include <cstdint>
-#include <vector>
-#include <msgpack.hpp>
 
-class generating_matrix {
-public:
-    uint64_t characteristic;
-    std::vector<std::vector<uint64_t> > contents;
-    generating_matrix(void){}
-    MSGPACK_DEFINE(characteristic, contents);
-};
-#endif
+uint64_t rdtsc(void){
+    unsigned int lo,hi;
+    __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
+    return ((uint64_t)hi << 32) | lo;
+}

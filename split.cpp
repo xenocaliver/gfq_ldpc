@@ -14,18 +14,23 @@
  * You should have received a copy of the GNU General Public License 
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-#ifndef GENERATING_MATRIX_HPP_
-#define GENERATING_MATRIX_HPP_
-#include <cstdint>
+#include <string>
 #include <vector>
-#include <msgpack.hpp>
 
-class generating_matrix {
-public:
-    uint64_t characteristic;
-    std::vector<std::vector<uint64_t> > contents;
-    generating_matrix(void){}
-    MSGPACK_DEFINE(characteristic, contents);
-};
-#endif
+std::vector<std::string> split(const std::string &s, const char delim) {
+    std::vector<std::string> elems;
+    std::string item;
+    for (char ch: s) {
+        if (ch == delim) {
+            if (!item.empty())
+                elems.push_back(item);
+            item.clear();
+        }
+        else {
+            item += ch;
+        }
+    }
+    if (!item.empty())
+        elems.push_back(item);
+    return elems;
+}

@@ -51,6 +51,10 @@ ExternalProject_Add(galois
 include_directories("/usr/include" "/usr/local/include" "${Boost_INCLUDE_DIRS}")
 link_directories("/usr/lib" "/usr/local/lib" "${Boost_LIBRARY_DIR}")
 
-add_executable(make-gen make-gen.cpp get_generating_matrix.cpp generating_matrix.hpp gfq_alist.hpp)
+add_executable(make-gen make-gen.cpp get_generating_matrix.cpp generating_matrix.hpp gfq_alist.hpp split.cpp split.hpp)
 add_dependencies(make-gen galois)
-target_link_libraries(make-gen ${DEPEND_LIB_ROOT}/libgalois++.a Boost::boost)
+target_link_libraries(make-gen ${DEPEND_LIB_ROOT}/libgalois++.a m)
+
+add_executable(gfq_simulator gfq_simulator.cpp decode.cpp encode.cpp transmit.cpp get_generating_matrix.cpp generating_matrix.hpp gfq_alist.hpp edge.hpp variable_node.hpp factor_node.hpp transmit.cpp factor_graph.cpp split.cpp split.hpp)
+add_dependencies(gfq_simulator galois)
+target_link_libraries(gfq_simulator ${DEPEND_LIB_ROOT}/libgalois++.a m)
