@@ -62,7 +62,7 @@ public:                                                /*                     */
         std::vector<std::vector<uint64_t> > nonzero_combination;
 
         for(uli = 0; uli < edges.size(); uli++) {
-            for(g = 0; g < gf->q; g++) {
+            for(g = 0; g < (uint64_t)(gf->q); g++) {
                 sum = 0.0;
                 nonzero_combination = this->search_for_other_elements(uli, g);
                 for(ull = 0; ull < nonzero_combination.size(); ull++) {

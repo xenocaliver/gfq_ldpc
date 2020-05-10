@@ -33,17 +33,16 @@ double BPSK(double x) {
 }
 
 std::vector<std::vector<double> > get_a_priori_probability(std::vector<std::vector<double> > channel_output, double sigma, const Galois::Field* gf) {
-    uint64_t characteristic = gf->q;
     uint64_t m = 0;
     uint64_t uli, ulj, ulk;
     uint64_t value;
     int64_t b;
     double prior_probability;
     
-    uint64_t q = gf->q;
+    uint64_t q = (uint64_t)(gf->q);
     /* get multiplicative degree */
     m = channel_output[0].size();
-    std::vector<std::vector<double> > f(channel_output.size(), std::vector<double>(m, 0));
+    std::vector<std::vector<double> > f(channel_output.size(), std::vector<double>(q, 0));
 
     for(uli = 0; uli < channel_output.size(); uli++) {
         for(ulj = 0; ulj < q; ulj++) {

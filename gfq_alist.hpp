@@ -68,7 +68,7 @@ public:
         std::string line;
         std::vector<std::string> v, w;
         std::vector<std::string>::iterator vit;
-        uint64_t uli, ulj, ulk;
+        uint64_t uli, ulk;
         std::vector<std::pair<uint64_t, uint64_t> > ev;
         std::string zero("0");
 
@@ -119,13 +119,11 @@ public:
         for(uli = 0; uli < this->number_of_columns; uli++) {
             getline(ifs, line);
             v = split(line, ' ');
-            for(ulj = 0; ulj < v.size(); ulj++){
-                for(ulk = 0; ulk < v.size(); ulk += 2) {
-                    if(v[ulk + 1] == zero) continue;
-                    pos.first = std::stoull(v[ulk], nullptr, 10);
-                    pos.second = std::stoull(v[ulk + 1], nullptr, 10);
-                    this->nlist[uli].push_back(pos);
-                }
+            for(ulk = 0; ulk < v.size(); ulk += 2) {
+                if(v[ulk + 1] == zero) continue;
+                pos.first = std::stoull(v[ulk], nullptr, 10);
+                pos.second = std::stoull(v[ulk + 1], nullptr, 10);
+                this->nlist[uli].push_back(pos);
             }
         }
 
@@ -133,13 +131,11 @@ public:
         for(uli = 0; uli < this->number_of_rows; uli++) {
             getline(ifs, line);
             v = split(line, ' ');
-            for(ulj = 0; ulj < v.size(); ulj++){
-                for(ulk = 0; ulk < v.size(); ulk += 2) {
-                    if(v[ulk + 1] == zero) continue;
-                    pos.first = std::stoull(v[ulk], nullptr, 10);
-                    pos.second = std::stoull(v[ulk + 1], nullptr, 10);
-                    this->mlist[uli].push_back(pos);
-                }
+            for(ulk = 0; ulk < v.size(); ulk += 2) {
+                if(v[ulk + 1] == zero) continue;
+                pos.first = std::stoull(v[ulk], nullptr, 10);
+                pos.second = std::stoull(v[ulk + 1], nullptr, 10);
+                this->mlist[uli].push_back(pos);
             }
         }
         return(1);

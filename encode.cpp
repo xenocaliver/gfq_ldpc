@@ -53,7 +53,7 @@ std::vector<std::vector<Galois::Element> > load_generating_matrix(std::string fi
     }
 
     try {
-        buf = new char(file_size);
+        buf = new char[file_size];
     } catch(std::bad_alloc e) {
         std::cerr << e.what() << std::endl;
         exit(-1);
@@ -62,12 +62,10 @@ std::vector<std::vector<Galois::Element> > load_generating_matrix(std::string fi
     ifs.open(file_name.c_str(), std::ios::in | std::ios::binary);
     if(!ifs) {
         std::cerr << "Can not open file: " << file_name << std::endl;
+        delete[] buf;
         exit(-1);
     }
-    if(!ifs.read(buf, file_size)) {
-        std::cerr << "Loading generating matrix file failed." << std::endl;
-        exit(-1);
-    }
+    ifs.read(buf, file_size);
     ifs.close();
 
     /* using msgpack, unpack generating matrix */
@@ -77,9 +75,11 @@ std::vector<std::vector<Galois::Element> > load_generating_matrix(std::string fi
         obj.convert(G);
     } catch(std::bad_cast& e) {
         std::cerr << e.what() << std::endl;
+        delete[] buf;
+        exit(-1);
     }
 
-    if(G.characteristic != gf->q) {
+    if(G.characteristic != (uint64_t)(gf->q)) {
         std::cerr << "characteristic do not match. " << G.characteristic << ", " << gf->q << std::endl;
         exit(-1);
     }
@@ -102,14 +102,14 @@ std::vector<std::vector<Galois::Element> > load_generating_matrix(std::string fi
 std::vector<Galois::Element> encode(std::vector<Galois::Element>& input, std::vector<std::vector<Galois::Element> >& G, const Galois::Field* gf) {
     uint64_t codeword_size = G.size();
     Galois::Element zero(gf, 0);
-    std::vector<Galois::Element> v;
+    std::vector<Galois::Element> u, v;
     uint64_t uli;
     std::vector<std::vector<Galois::Element> > B, C;
 
-    for(uli = 0; uli < codeword_size; uli++) {
-        v.push_back(zero);
-    }
-    B.push_back(input);
+    v.push_back(zero);
+    for(uli = 0; uli < input.size(); uli++) B.push_back(v);
+    for(uli = 0; uli < input.size(); uli++) B[uli][0] = input[uli];
     C = gfq_matrix_product(G, B, gf);
-    return(C[0]);
+    for(uli = 0; uli < codeword_size; uli++) u.push_back(C[uli][0]);
+    return(u);
 }

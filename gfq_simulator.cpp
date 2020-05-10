@@ -82,7 +82,6 @@ int main(int argc, char* argv[]) {
     sigma = std::stod(argv[4]);
     std::mt19937_64 mt(1234);
     std::uniform_int_distribution<uint64_t> input_symbol(0, alist.characteristic);
-    std::normal_distribution<double> gaussian(0.0, sigma);
     uint64_t number_of_trial = std::strtoull(argv[3], nullptr, 10);
     generating_matrix = load_generating_matrix(std::string(argv[2]), &gf);
     construct_factor_graph(variable_nodes, factor_nodes, edges, alist, &gf);
@@ -90,9 +89,11 @@ int main(int argc, char* argv[]) {
     for(uli = 0; uli < alist.mlist.size(); uli++) {
         factor_nodes[uli].fullfill_table = search_for_fullfill_set(alist.mlist[uli], &gf);
     }
-    for(uli = 0; uli < edges.size(); uli++) {
-        edges[uli].factor_to_variable_message.resize(gf.q);
-        edges[uli].variable_to_factor_message.resize(gf.q);
+    for(uli = 0; uli < variable_nodes.size(); uli++) {
+        for(ulj = 0; ulj < variable_nodes[uli].edges.size(); ulj++) {
+            variable_nodes[uli].edges[ulj]->variable_to_factor_message.resize((uint64_t)(gf.q));
+            variable_nodes[uli].edges[ulj]->factor_to_variable_message.resize((uint64_t)(gf.q));
+        }
     }
 
     /* main loop */
@@ -113,23 +114,25 @@ int main(int argc, char* argv[]) {
         /* initialize messages */
         for(uli = 0; uli < variable_nodes.size(); uli++) {
             for(ulj = 0; ulj < variable_nodes[uli].edges.size(); ulj++) {
-                for(g = 0; g < gf.q; g++) {
+                for(g = 0; g < (uint64_t)(gf.q); g++) {
                     variable_nodes[uli].edges[ulj]->variable_to_factor_message[g] = a_priori_probability[uli][g];
                 }
             }
         }
         for(uli = 0; uli < factor_nodes.size(); uli++) {
             for(ulj = 0; ulj < factor_nodes[uli].edges.size(); ulj++) {
-                for(g = 0; g < gf.q; g++) {
+                for(g = 0; g < (uint64_t)(gf.q); g++) {
                     factor_nodes[uli].edges[ulj]->factor_to_variable_message[g] = 1.0;
                 }
             }
         }
+        std::cout << "go sum product decode" << std::endl;
         /* do decoding process */
         for(iteration = 0; iteration < iteration_limit; iteration++) {
             /* update messages */
             for(uli = 0; uli < factor_nodes.size(); uli++) factor_nodes[uli].update_messages(&gf);
             for(uli = 0; uli < variable_nodes.size(); uli++) variable_nodes[uli].update_messages(&gf);
+            std::cout << iteration << std::endl;
             /* speculate code word */
             for(uli = 0; uli < variable_nodes.size(); uli++) speculated_codeword[uli] = variable_nodes[uli].speculate_temporal_symbol(&gf);
             parity_check_result = parity_check(speculated_codeword, alist.mlist, &gf);

@@ -31,7 +31,7 @@
 extern double BPSK(double);
 
 std::vector<std::vector<double> > transmit(std::vector<Galois::Element>& input, const Galois::Field* gf, double sigma, std::mt19937_64* mt) {
-    uint64_t q = gf->q;
+    uint64_t q = (uint64_t)(gf->q);
     uint64_t m = 0;                            /* multiplicative order */
     uint64_t uli, ulj;
     uint64_t value;

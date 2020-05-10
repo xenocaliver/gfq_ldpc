@@ -44,7 +44,7 @@ std::vector<std::vector<Galois::Element> > gfq_matrix_product(std::vector<std::v
         std::cerr << "Can not match dimension:" << row_size[0] << ", " << column_size[0] << ", " << row_size[1] << ", " << column_size[1] << std::endl;
         exit(1);
     }
-    v.clear();
+
     for(ulj = 0; ulj < column_size[1]; ulj++) v.push_back(zero);
     for(uli = 0; uli < row_size[0]; uli++) C.push_back(v);
 
