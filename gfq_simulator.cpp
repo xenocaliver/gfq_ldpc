@@ -86,9 +86,6 @@ int main(int argc, char* argv[]) {
     generating_matrix = load_generating_matrix(std::string(argv[2]), &gf);
     construct_factor_graph(variable_nodes, factor_nodes, edges, alist, &gf);
     for(uli = 0; uli < dimension; uli++) input_vector.push_back(gfe);
-    for(uli = 0; uli < alist.mlist.size(); uli++) {
-        factor_nodes[uli].fullfill_table = search_for_fullfill_set(alist.mlist[uli], &gf);
-    }
     for(uli = 0; uli < variable_nodes.size(); uli++) {
         for(ulj = 0; ulj < variable_nodes[uli].edges.size(); ulj++) {
             variable_nodes[uli].edges[ulj]->variable_to_factor_message.resize((uint64_t)(gf.q));
@@ -97,7 +94,7 @@ int main(int argc, char* argv[]) {
     }
 
     /* main loop */
-    for(trial = 0; number_of_trial; trial++) {
+    for(trial = 0; trial < number_of_trial; trial++) {
         /* generate input words */
         for(uli = 0; uli < dimension; uli++) {
             g = input_symbol(mt);
@@ -106,6 +103,10 @@ int main(int argc, char* argv[]) {
         }
         /* encode */
         codeword = encode(input_vector, generating_matrix, &gf);
+        for(uli = 0; uli < codeword.size(); uli++) {
+            std::cout << std::setw(2) << codeword[uli].value() << " ";
+        }
+        std::cout << std::endl;
         /* add awgn noise */
         received_signals = transmit(codeword, &gf, sigma, &mt);
         /* calculate a priori probability */
@@ -126,13 +127,11 @@ int main(int argc, char* argv[]) {
                 }
             }
         }
-        std::cout << "go sum product decode" << std::endl;
         /* do decoding process */
         for(iteration = 0; iteration < iteration_limit; iteration++) {
             /* update messages */
             for(uli = 0; uli < factor_nodes.size(); uli++) factor_nodes[uli].update_messages(&gf);
             for(uli = 0; uli < variable_nodes.size(); uli++) variable_nodes[uli].update_messages(&gf);
-            std::cout << iteration << std::endl;
             /* speculate code word */
             for(uli = 0; uli < variable_nodes.size(); uli++) speculated_codeword[uli] = variable_nodes[uli].speculate_temporal_symbol(&gf);
             parity_check_result = parity_check(speculated_codeword, alist.mlist, &gf);

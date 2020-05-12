@@ -21,6 +21,7 @@
 #include <cmath>
 #include <vector>
 #include <map>
+#include <iomanip>
 
 #include <galois++/array2d.h>
 #include <galois++/element.h>
@@ -36,42 +37,24 @@ public:                                                /*                     */
     uint64_t ID;                                       /* identifier          */
     std::vector<edge*> edges;                          /* edges               */
     std::vector<std::pair<uint64_t, uint64_t> > parity_check_matrix_elements;
-    std::vector<std::vector<uint64_t> > fullfill_table; /*                    */
     factor_node(void) : ID(0) {}                       /* default constructor */
-
-    std::vector<std::vector<uint64_t> > search_for_other_elements(uint64_t uli, uint64_t g) {
-        std::vector<std::vector<uint64_t> > rtnv;
-        std::vector<uint64_t> u, v;
-        std::vector<std::vector<uint64_t> >::iterator vit;
-
-        for(vit = this->fullfill_table.begin(); vit != this->fullfill_table.end(); ++vit) {
-            u = *vit;
-            if(u[uli] == g) {
-                v = *vit;
-                rtnv.push_back(v);
-            }
-        }
-        return(rtnv);
-    }
 
     void update_messages(const Galois::Field* gf) {
         uint64_t uli, ulj, ull;
         uint64_t g;
         double sum = 1.0;
         double prod;
-        std::vector<std::vector<uint64_t> > nonzero_combination;
 
-        for(uli = 0; uli < edges.size(); uli++) {
+        for(uli = 0; uli < this->edges.size(); uli++) {
             for(g = 0; g < (uint64_t)(gf->q); g++) {
                 sum = 0.0;
-                nonzero_combination = this->search_for_other_elements(uli, g);
-                for(ull = 0; ull < nonzero_combination.size(); ull++) {
+                for(ull = 0; ull < this->edges[uli]->edgewise_fullfill_table[g].size(); ull++) {
                     prod = 1.0;
                     for(ulj = uli + 1; ulj < edges.size(); ulj++) {
-                        prod *= this->edges[ulj]->variable_to_factor_message[nonzero_combination[ull][ulj]];
+                        prod *= this->edges[ulj]->variable_to_factor_message[this->edges[uli]->edgewise_fullfill_table[g][ull][ulj]];
                     }
-                    for(ulj = 0; ulj < uli; uli++) {
-                        prod *= this->edges[ulj]->variable_to_factor_message[nonzero_combination[ull][ulj]];
+                    for(ulj = 0; ulj < uli; ulj++) {
+                        prod *= this->edges[ulj]->variable_to_factor_message[this->edges[uli]->edgewise_fullfill_table[g][ull][ulj]];
                     }
                     sum += prod;
                 }

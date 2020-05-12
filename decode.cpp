@@ -66,13 +66,21 @@ bool parity_check(std::vector<uint64_t> speculate_temporal_symbols, std::vector<
     Galois::Element zero(gf, 0);
     Galois::Element sum(gf, 0);
 
+    std::cout << "speculate code word" << std::endl;
+    for(uli = 0; uli < speculate_temporal_symbols.size(); uli++) {
+        std::cout << std::setw(2) << speculate_temporal_symbols[uli] << " ";
+    }
+    std::cout << std::endl;
+
     for(uli = 0; uli < mlist.size(); uli++) {
         sum = zero;
         for(ulj = 0; ulj < mlist[uli].size(); ulj++) {
             parity_check_element.setValue(mlist[uli][ulj].second);
             temporal_symbol.setValue(speculate_temporal_symbols[mlist[uli][ulj].first]);
             sum += parity_check_element*temporal_symbol;
+            std::cout << std::setw(2) << temporal_symbol.value() << "*" << parity_check_element.value() << " ";
         }
+        std::cout << sum.value() << std::endl;
         if(sum != zero) {
             return(false);
         }
