@@ -76,7 +76,7 @@ bool parity_check(std::vector<uint64_t> speculate_temporal_symbols, std::vector<
         sum = zero;
         for(ulj = 0; ulj < mlist[uli].size(); ulj++) {
             parity_check_element.setValue(mlist[uli][ulj].second);
-            temporal_symbol.setValue(speculate_temporal_symbols[mlist[uli][ulj].first]);
+            temporal_symbol.setValue(speculate_temporal_symbols[mlist[uli][ulj].first - 1]);
             sum += parity_check_element*temporal_symbol;
             std::cout << std::setw(2) << temporal_symbol.value() << "*" << parity_check_element.value() << " ";
         }

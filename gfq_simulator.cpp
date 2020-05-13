@@ -103,6 +103,7 @@ int main(int argc, char* argv[]) {
         }
         /* encode */
         codeword = encode(input_vector, generating_matrix, &gf);
+        std::cout << "*** encoded word ***" << std::endl;
         for(uli = 0; uli < codeword.size(); uli++) {
             std::cout << std::setw(2) << codeword[uli].value() << " ";
         }
@@ -127,6 +128,7 @@ int main(int argc, char* argv[]) {
                 }
             }
         }
+        parity_check_result = false;
         /* do decoding process */
         for(iteration = 0; iteration < iteration_limit; iteration++) {
             /* update messages */

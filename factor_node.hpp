@@ -42,12 +42,13 @@ public:                                                /*                     */
     void update_messages(const Galois::Field* gf) {
         uint64_t uli, ulj, ull;
         uint64_t g;
-        double sum = 1.0;
-        double prod;
+        double sum = 0.0;
+        double prod = 1.0;
 
         for(uli = 0; uli < this->edges.size(); uli++) {
             for(g = 0; g < (uint64_t)(gf->q); g++) {
                 sum = 0.0;
+                if((uli == 0) && (this->ID == 0)) std::cout << "fullfill combination = " << this->edges[uli]->edgewise_fullfill_table[g].size() << std::endl;
                 for(ull = 0; ull < this->edges[uli]->edgewise_fullfill_table[g].size(); ull++) {
                     prod = 1.0;
                     for(ulj = uli + 1; ulj < edges.size(); ulj++) {
@@ -58,6 +59,7 @@ public:                                                /*                     */
                     }
                     sum += prod;
                 }
+                if((uli == 0) && (this->ID == 0)) std::cout << "g = " << g << " sum = " << sum << std::endl;
                 this->edges[uli]->factor_to_variable_message[g] = sum;
             }
         }

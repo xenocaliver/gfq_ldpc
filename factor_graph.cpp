@@ -117,8 +117,8 @@ void construct_factor_graph(std::vector<variable_node>& variable_nodes, std::vec
         factor_nodes[uli].parity_check_matrix_elements = alist.mlist[uli];
         fullfill_table = search_for_fullfill_set(alist.mlist[uli], gf);
         for(ulk = 0; ulk < factor_nodes[uli].edges.size(); ulk++) {
-            u.clear();
             for(g = 0; g < (uint64_t)(gf->q); g++) {
+                u.clear();
                 for(vit = fullfill_table.begin(); vit < fullfill_table.end(); ++vit) {
                     v = *vit;
                     if(v[ulk] == g) {
