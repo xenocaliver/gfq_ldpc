@@ -53,7 +53,7 @@ std::vector<std::vector<double> > get_a_priori_probability(std::vector<std::vect
                 prior_probability *= (1 + exp(2.0*BPSK((double)b)*channel_output[uli][ulk]/(sigma*sigma)));
                 value = value >> 1;
             }
-            f[uli][ulj] = 1.0/prior_probability;
+            f[uli][q - 1 - ulj] = 1.0/prior_probability;
         }
     }
     return(f);
@@ -78,9 +78,7 @@ bool parity_check(std::vector<uint64_t> speculate_temporal_symbols, std::vector<
             parity_check_element.setValue(mlist[uli][ulj].second);
             temporal_symbol.setValue(speculate_temporal_symbols[mlist[uli][ulj].first - 1]);
             sum += parity_check_element*temporal_symbol;
-            std::cout << std::setw(2) << temporal_symbol.value() << "*" << parity_check_element.value() << " ";
         }
-        std::cout << sum.value() << std::endl;
         if(sum != zero) {
             return(false);
         }

@@ -65,25 +65,25 @@ public:                                                /*                     */
         uint64_t characteristic = gf->q;
         uint64_t g;                             /* galois field element value */
         double product;                                /*                     */
-        double sum;
+        double sum = 0.0;
         double max = 0.0;
         uint64_t rtnv = 0;
         std::vector<double> new_message(characteristic, 1.0);
 
         for(g = 0; g < characteristic; g++) {
-            product = channel_output_probability[g];
+            product = this->channel_output_probability[g];
             for(ulj = 0; ulj < this->edges.size(); ulj++) {
                 product *= this->edges[ulj]->factor_to_variable_message[g];
-                if(product < 1e-24) product = 1e-24;
             }
             new_message[g] = product;
         }
-        sum = 0.0;
+
         for(g = 0; g < characteristic; g++) {
             sum += new_message[g];
         }
+        
         for(g = 0; g < characteristic; g++) {
-            new_message[g] /= sum;
+            new_message[g] = new_message[g]/sum;
         }
 
         for(g = 0; g < characteristic; g++) {
