@@ -49,31 +49,31 @@ Thus parity check and encoding part of the simulator code are very simple.
 
 ### Encoding
 The simulator's generating matrix is constructed as follows.
-Let $\bm{c}$ a codeword(column vector), $H$ a parity check matrix. If $\bm{c}$ is a codeword, 
+Let $\boldsymbol{c}$ a codeword(column vector), $H$ a parity check matrix. If $\boldsymbol{c}$ is a codeword, 
 $$
-H\bm{c}=\bm{0}
+H\boldsymbol{c}=\boldsymbol{0}
 $$
-holds. And we assume we can split $\bm{c}$ into two parts $\bm{p}$ and $\bm{s}$. $\bm{p}$ represents a parity check symbol part and $\bm{s}$ represents input symbol part.
+holds. And we assume we can split $\boldsymbol{c}$ into two parts $\boldsymbol{p}$ and $\boldsymbol{s}$. $\boldsymbol{p}$ represents a parity check symbol part and $\boldsymbol{s}$ represents input symbol part.
 And we devide $H$ into two part i.e.
 $$
 H=\left(A\vert B\right).
 $$
-$A$'s number of columns coinides with $\bm{p}$'s dimension. $B$'s number of columns coincides with $\bm{s}$'s dimension. So,
+$A$'s number of columns coinides with $\boldsymbol{p}$'s dimension. $B$'s number of columns coincides with $\boldsymbol{s}$'s dimension. So,
 $$
-A\bm{p}+B\bm{s}=\bm{0}
+A\boldsymbol{p}+B\boldsymbol{s}=\boldsymbol{0}
 $$
-holds. Therefore one can calculate $\bm{p}$ by means of following expression:
+holds. Therefore one can calculate $\boldsymbol{p}$ by means of following expression:
 $$
-\bm{p}=-A^{-1}B\bm{s}.
+\boldsymbol{p}=-A^{-1}B\boldsymbol{s}.
 $$
 Next, one can calculate $A^{-1}$ by means of $LU$ decompsition. However, one can apply $LU$ decomposition only if $A$ is full rank. However $A$ is not always full rank. So, `make-gen` permuates $H$'s columns and make $A$ be full rank. A column permuation corresponds to a matrix. Let $Q_{i}(i=1,\ldots, m)$ be a matrix corresponding to a column exchange. So we can write
 $$
-\bm{c}=\left(
+\boldsymbol{c}=\left(
     \begin{array}{c}
     -A^{-1}B\\
     I
     \end{array}
-    \right)Q_{1}\cdots Q_{m}\bm{s}
+    \right)Q_{1}\cdots Q_{m}\boldsymbol{s}
 $$
 where $I$ is an identity matrix and we used $Q_{i}^{-1}=Q_{i}$. Therefore we obtain generating matrix $G$ as follows:
 $$
