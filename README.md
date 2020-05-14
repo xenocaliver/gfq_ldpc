@@ -50,51 +50,25 @@ Thus parity check and encoding part of the simulator code are very simple.
 ### Encoding
 The simulator's generating matrix is constructed as follows.
 Let $\boldsymbol{c}$ a codeword(column vector), $H$ a parity check matrix. If $\boldsymbol{c}$ is a codeword, 
-$$
-H\boldsymbol{c}=\boldsymbol{0}
-$$
+$$ H\boldsymbol{c}=\boldsymbol{0} $$
 holds. And we assume we can split $\boldsymbol{c}$ into two parts $\boldsymbol{p}$ and $\boldsymbol{s}$. $\boldsymbol{p}$ represents a parity check symbol part and $\boldsymbol{s}$ represents input symbol part.
 And we devide $H$ into two part i.e.
-$$
-H=\left(A\vert B\right).
-$$
+$$ H=\left(A\vert B\right). $$
 $A$'s number of columns coinides with $\boldsymbol{p}$'s dimension. $B$'s number of columns coincides with $\boldsymbol{s}$'s dimension. So,
-$$
-A\boldsymbol{p}+B\boldsymbol{s}=\boldsymbol{0}
-$$
+$$ A\boldsymbol{p}+B\boldsymbol{s}=\boldsymbol{0} $$
 holds. Therefore one can calculate $\boldsymbol{p}$ by means of following expression:
-$$
-\boldsymbol{p}=-A^{-1}B\boldsymbol{s}.
-$$
+$$ \boldsymbol{p}=-A^{-1}B\boldsymbol{s}. $$
 Next, one can calculate $A^{-1}$ by means of $LU$ decompsition. However, one can apply $LU$ decomposition only if $A$ is full rank. However $A$ is not always full rank. So, `make-gen` permuates $H$'s columns and make $A$ be full rank. A column permuation corresponds to a matrix. Let $Q_{i}(i=1,\ldots, m)$ be a matrix corresponding to a column exchange. So we can write
-$$
-\boldsymbol{c}=\left(
-    \begin{array}{c}
-    -A^{-1}B\\
-    I
-    \end{array}
-    \right)Q_{1}\cdots Q_{m}\boldsymbol{s}
-$$
+$$ \boldsymbol{c}=\left( \begin{array}{c} -A^{-1}B\\ I \end{array} \right)Q_{1}\cdots Q_{m}\boldsymbol{s} $$
 where $I$ is an identity matrix and we used $Q_{i}^{-1}=Q_{i}$. Therefore we obtain generating matrix $G$ as follows:
-$$
-G=\left(
-    \begin{array}{c}
-    -A^{-1}B\\
-    I
-    \end{array}
-    \right)Q_{1}\cdots Q_{m}.
-$$
+$$ G=\left( \begin{array}{c} -A^{-1}B\\ I \end{array} \right)Q_{1}\cdots Q_{m}. $$
 
 ## Transmitting a symbol over AWGN channel
 We assumed that channel is AWGN channel with standard deviation $\sigma$ and assumed
 finite field be $\mathbb{F}_{q}, q=2^{m}$. According to [Davey](https://ieeexplore.ieee.org/document/706440), each bit of a symbol is modulated to BPSK and bitwise prior probability for bit $k$ is given by
-$$
-p_{k}=\frac{1}{1+\exp[2s_{k}y_{k}/\sigma^{2}]}
-$$
+$$ p_{k}=\frac{1}{1+\exp[2s_{k}y_{k}/\sigma^{2}]} $$
 where $s_{k}$ is BPSK modulated value of the bit $k$ and $y_{k}$ is a observed value of bit $k$. Therefore prior probability according to symbol $g\in\mathbb{F}_{q}$ is given by
-$$
-f(g) = \prod_{k=1}^{m}\frac{1}{1+\exp[2s_{k}y_{k}/\sigma^{2}]}.
-$$
+$$ f(g) = \prod_{k=1}^{m}\frac{1}{1+\exp[2s_{k}y_{k}/\sigma^{2}]}. $$
 
 ## Decoding
 
