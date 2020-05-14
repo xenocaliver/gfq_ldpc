@@ -68,7 +68,7 @@ We assumed that channel is AWGN channel with standard deviation $\sigma$ and ass
 finite field be $\mathbb{F}_{q}, q=2^{m}$. According to [Davey](https://ieeexplore.ieee.org/document/706440), each bit of a symbol is modulated to BPSK and bitwise prior probability for bit $k$ is given by
 $$ p_{k}=\frac{1}{1+\exp[2s_{k}y_{k}/\sigma^{2}]} $$
 where $s_{k}$ is BPSK modulated value of the bit $k$ and $y_{k}$ is a observed value of bit $k$. Therefore prior probability according to symbol $g\in\mathbb{F}_{q}$ is given by
-$$ f(g) = \prod_{k=1}^{m}\frac{1}{1+\exp[2s_{k}y_{k}/\sigma^{2}]}. $$
+\[f(g) = \prod_{k=1}^{m}\frac{1}{1+\exp[2s_{k}y_{k}/\sigma^{2}]}.\]
 
 ## Decoding
 
