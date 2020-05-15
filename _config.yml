@@ -1,14 +1,2 @@
 theme: jekyll-theme-cayman
-math:
-  engine: 'mathjax' # or 'katex'
-  mathjax:
-    src: http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML
-    config:
-      tex2jax:
-        inlineMath: [ ['$','$'], ["\\(","\\)"] ]
-        displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-      TeX:
-        Macros:
-          dd: \mathrm{d}
-          RR: \mathbb{R}
-          argmax: \operatorname*{argmax}
+mathjax: true
