@@ -1,2 +1,2 @@
 theme: jekyll-theme-cayman
-mathjax: true
+use_math: true
