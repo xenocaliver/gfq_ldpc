@@ -1,11 +1,3 @@
----
-theme: jekyll-theme-cayman
-layout: default
-use_math: true
-mathjax: true
-markdown: kramdown
-<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
----
 # gfq_ldpc
 Non-binary LDPC encode and decode simulation programs
 
