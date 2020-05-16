@@ -1,6 +1,3 @@
----
-mathjax: true
----
 # gfq_ldpc
 Non-binary LDPC encode and decode simulation programs
 
