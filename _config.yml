@@ -1,2 +1,4 @@
 theme: jekyll-theme-cayman
+layout: default
 use_math: true
+mathjax: true
