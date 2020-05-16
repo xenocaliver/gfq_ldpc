@@ -75,7 +75,7 @@ $$
 G=\left( \begin{array}{c} -A^{-1}B\\ I \end{array} \right)Q_{1}\cdots Q_{m}.
 $$
 
-## Transmitting a symbol over AWGN channel
+### Transmitting a symbol over AWGN channel
 We assumed that channel is AWGN channel with standard deviation $\sigma$ and assumed
 finite field be $\mathbb{F}_{q}, q=2^{M}$. According to [Davey](https://ieeexplore.ieee.org/document/706440), each bit of a symbol is modulated to BPSK and bitwise prior probability for bit $i$ is given by
 $$
@@ -86,7 +86,7 @@ $$
 f(g) = \prod_{i=1}^{M}\frac{1}{1+\exp[2s_{i}\vert y_{i}\vert/\sigma^{2}]}.
 $$
 
-## Decoding
+### Decoding
 We employ probability region Sum-Product algorithm for decoding according to [Davey](https://ieeexplore.ieee.org/document/706440).
 Let $q_{mn}(g)$ be a veriable node $n$ to factor node message $m$ where g is a finite field element's value. Let $r_{nm}$ be a factor node $m$ to variable node $n$ message.
 
