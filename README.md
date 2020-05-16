@@ -1,3 +1,7 @@
+---
+mathjax: true
+layout: default
+---
 # gfq_ldpc
 Non-binary LDPC encode and decode simulation programs
 
