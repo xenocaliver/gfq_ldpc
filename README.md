@@ -106,7 +106,7 @@ After that normalizing $q_{mn}(g)$ with respect $g$.
 ### Speculating tempral code word
 In order to speculate temporal codeword, calculate probability which each symbols equals to $g$. The probability are given by
 $$
-p_{n}(g)=f_{n}(g)\prod_{m^{\prime}\in∂ n}r_{nm}(g)
+p_{n}(g)=f_{n}(g)\prod_{m^{\prime}\in∂ n}r_{nm^{\prime}}(g)
 $$
 Finally, speculated $n-$th symbol $\hat{g}_{n}$ is given by
 $$
