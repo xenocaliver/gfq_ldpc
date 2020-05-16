@@ -98,7 +98,7 @@ $$
 Variable to factor node message updte processes are given by
 
 $$
-q_{mn}(g)=f_{n}(g)\prod_{m^{\prime}\in∂ n\backslash m}r_{nm}(g).
+q_{mn}(g)=f_{n}(g)\prod_{m^{\prime}\in∂ n\backslash m}r_{nm^{\prime}}(g).
 $$
 
 After that normalizing $q_{mn}(g)$ with respect $g$.
