@@ -81,7 +81,7 @@ int main(int argc, char* argv[]) {
     Galois::Element gfe(&gf, 0);
     sigma = std::stod(argv[4]);
     std::mt19937_64 mt(1234);
-    std::uniform_int_distribution<uint64_t> input_symbol(0, alist.characteristic);
+    std::uniform_int_distribution<uint64_t> input_symbol(0, alist.characteristic - 1);
     uint64_t number_of_trial = std::strtoull(argv[3], nullptr, 10);
     generating_matrix = load_generating_matrix(std::string(argv[2]), &gf);
     construct_factor_graph(variable_nodes, factor_nodes, edges, alist, &gf);
