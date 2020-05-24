@@ -73,6 +73,7 @@ public:
         std::string zero("0");
 
         getline(ifs, line);
+        boost::trim(line);
         v = split(line, ' ');           /* split by empty string */
         if(v.size() != 3) {
             std::cerr << "Invalid ALIST FILE" << std::endl;
@@ -88,6 +89,7 @@ public:
         }
         std::pair<uint64_t, uint64_t> pos(0, 0);
         getline(ifs, line);
+        boost::trim(line);
         v = split(line, ' ');
         if(v.size() != 2) {
             std::cerr << "Invalid ALIST FILE" << std::endl;
@@ -118,6 +120,7 @@ public:
         this->nlist.resize(this->number_of_columns);
         for(uli = 0; uli < this->number_of_columns; uli++) {
             getline(ifs, line);
+            boost::trim(line);
             v = split(line, ' ');
             for(ulk = 0; ulk < v.size(); ulk += 2) {
                 if(v[ulk + 1] == zero) continue;
@@ -130,6 +133,7 @@ public:
         this->mlist.resize(this->number_of_rows);
         for(uli = 0; uli < this->number_of_rows; uli++) {
             getline(ifs, line);
+            boost::trim(line);
             v = split(line, ' ');
             for(ulk = 0; ulk < v.size(); ulk += 2) {
                 if(v[ulk + 1] == zero) continue;
