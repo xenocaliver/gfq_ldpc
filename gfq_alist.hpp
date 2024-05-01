@@ -24,12 +24,12 @@
 #include <cstdint>
 #include <string>
 #include <utility>
+#include <boost/algorithm/string/trim.hpp>
 #include <galois++/array2d.h>
 #include <galois++/element.h>
 #include <galois++/field.h>
 #include <galois++/fwd.h>
 #include <galois++/primes.h>
-#include <boost/algorithm/string.hpp>  // for split function
 
 #include "split.hpp"
 

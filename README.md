@@ -10,6 +10,8 @@ Install following tools.
 - make
 - cmake
 - [msgpack](https://github.com/msgpack/msgpack-c)
+- [galois++](https://github.com/wkjarosz/galois)
+- [fftw](https://www.fftw.org)
 
 ## Downloading the simulator
 Clone simulator's repository.
@@ -81,7 +83,7 @@ $$
 where $I$ is an identity matrix and we used $Q_{i}^{-1}=Q_{i}$. Therefore we obtain generating matrix $G$ as follows:
 
 $$
-G=\left( \begin{array}{c} -A^{-1}B\\ I \end{array} \right)Q_{1}\cdots Q_{m}.
+G=\left( \begin{array}{c} -A^{-1}B\\ I \end{array} \right)Q_{1}\cdots Q_{l}.
 $$
 
 ### Transmitting a symbol over AWGN channel
@@ -113,13 +115,13 @@ $$
 Factor to variable node message update processes are given by
 
 $$
-r_{nm}(g)=\sum_{x_{i_{1}}}\cdots\sum_{x_{i_{d_{c}-1}}}\mathbbm{1}[\sum_{k=1}^{d_{c}}h_{mi_{k}}x_{i_{k}}=0|x_{n} = g]\prod_{i_{k}\in∂ m\backslash n}q_{mn^{\prime}}(x_{i_{k}})
+r_{nm}(g)=\sum_{x_{i_{1}}}\cdots\sum_{x_{i_{d_{c}-1}}}\boldsymbol{1}[\sum_{k=1}^{d_{c}}h_{mi_{k}}x_{i_{k}}=0|x_{n} = g]\prod_{i_{k}\in∂ m\backslash n}q_{mn^{\prime}}(x_{i_{k}})
 $$
 
 where $\boldsymbol{1}$ denotes an indicator function i.e.
 
 $$
-\mathbbm{1}[A]=
+\boldsymbol{1}[A]=
 \begin{cases}
 1& (A\quad\mathrm{is\quad true})\\
 0& (A\quad\mathrm{is\quad false}).
@@ -130,7 +132,7 @@ $$
 Variable to factor node message updte processes are given by
 
 $$
-q_{mn}(g)=f_{n}(g)\prod_{m^{\prime}\in∂ n\backslash m}r_{nm^{\prime}}(g).
+q_{mn}(g)=f_{n}(g)\prod_{m^{\prime}\in\partial n\backslash m}r_{nm^{\prime}}(g).
 $$
 
 After that normalizing $q_{mn}(g)$ with respect $g$.
@@ -139,7 +141,7 @@ After that normalizing $q_{mn}(g)$ with respect $g$.
 In order to speculate temporal codeword, calculate probability which each symbols equals to $g$. The probability are given by
 
 $$
-p_{n}(g)=f_{n}(g)\prod_{m^{\prime}\in∂ n}r_{nm^{\prime}}(g).
+p_{n}(g)=f_{n}(g)\prod_{m^{\prime}\in\partial n}r_{nm^{\prime}}(g).
 $$
 
 Finally, speculated $n-$th symbol $\hat{g}_{n}$ is given by
