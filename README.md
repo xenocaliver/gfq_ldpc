@@ -131,7 +131,7 @@ $$
 However, this update rule's computing complexity is very large and is not practical. Threfore, we use fourier transformaion according to [Hong](https://ieeexplore.ieee.org/document/6113595/). Another update rule is shown as follows. At first, we apply fourier transformation to variable to factor messages as follows:
 
 $$
-\vec{Q}_{mn} = \mathscr{F}\left[\vec{q}_{mn}\right]
+\vec{Q}_{mn} = \mathcal{F}\left[\vec{q}_{mn}\right]
 $$
 
 where $\vec{Q}_{mn} = (Q_{mn}(0),Q{mn}(1),\ldots,Q_{mn}(2^{M}-1))$ and $\vec{q}_{mn} = (q_{mn}(0), q_{mn}(1),\ldots, q_{mn}(2^{M}-1))$. And we update factor to variable messages in frequency domain $\vec{R}_{nm}$ as follows:
@@ -143,7 +143,7 @@ $$
 Then, we apply inverse fourier transform to $\bm{R}_{mn}$ and get variable to factor messages in real domain as follows:
 
 $$
-\vec{r}_{nm} = \mathscr{F}^{-1}\left[\vec{R}_{nm}\right].
+\vec{r}_{nm} = \mathcal{F}^{-1}\left[\vec{R}_{nm}\right].
 $$
 
 Due to discrete fourier transformation's property, we must do following renormalization:
