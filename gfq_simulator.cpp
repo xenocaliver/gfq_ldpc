@@ -36,11 +36,9 @@
 #include "generating_matrix.hpp"
 
 extern std::vector<std::vector<double> > get_a_priori_probability(std::vector<std::vector<double> >, double, const Galois::Field*);
-extern std::vector<std::vector<uint64_t> > search_for_fullfill_set(std::vector<std::map<uint64_t, uint64_t> >&, const Galois::Field*);
 extern void construct_factor_graph(std::vector<variable_node>&, std::vector<factor_node>&, std::vector<edge>&, gfq_alist, Galois::Field*);
 extern std::vector<std::vector<double> > transmit(std::vector<Galois::Element>&, const Galois::Field*, double, std::mt19937_64*);
 extern std::vector<std::vector<Galois::Element> > load_generating_matrix(std::string, const Galois::Field*);
-extern std::vector<std::vector<uint64_t> > search_for_fullfill_set(std::vector<std::pair<uint64_t, uint64_t> >&, const Galois::Field*); 
 extern bool parity_check(std::vector<uint64_t>, std::vector<std::vector<std::pair<uint64_t, uint64_t> > >, const Galois::Field*); 
 extern std::vector<Galois::Element> encode(std::vector<Galois::Element>&, std::vector<std::vector<Galois::Element> >&, const Galois::Field*);
 extern uint64_t rdtsc(void);

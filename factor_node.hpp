@@ -29,7 +29,10 @@
 #include <galois++/fwd.h>
 #include <galois++/primes.h>
 
+#include <fftw3.h>
+
 #include "edge.hpp"
+#include "constants.hpp"
 
 
 class factor_node {                                    /*                     */
@@ -39,27 +42,38 @@ public:                                                /*                     */
     std::vector<std::pair<uint64_t, uint64_t> > parity_check_matrix_elements;
     factor_node(void) : ID(0) {}                       /* default constructor */
 
+    std::vector<double> fourier_transform(std::vector<double> q) {
+        std::vector<double> Q(q.size(), 0.0);
+
+        fftw_plan plan = fftw_plan_r2r_1d(q.size(), q.data(), Q.data(), FFTW_REDFT11, FFTW_MEASURE);
+        fftw_execute(plan);
+        fftw_destroy_plan(plan);
+        return(Q);
+    }
+
     void update_messages(const Galois::Field* gf) {
-        uint64_t uli, ulj, ull;
+        uint64_t uli, ulj;
         uint64_t g;
-        double sum = 0.0;
-        double prod = 1.0;
+        std::vector<std::vector<double> > Q(this->edges.size(), std::vector<double>((uint64_t)(gf->q), 0.0));
+        std::vector<double> R((uint64_t)(gf->q), 0.0);
+        std::vector<double> product((uint64_t)(gf->q), 1.0);
 
         for(uli = 0; uli < this->edges.size(); uli++) {
+            Q[uli] = fourier_transform(this->edges[uli]->variable_to_factor_message);
+        }
+        for(uli = 0; uli < this->edges.size(); uli++) {
             for(g = 0; g < (uint64_t)(gf->q); g++) {
-                sum = 0.0;
-                for(ull = 0; ull < this->edges[uli]->edgewise_fullfill_table[g].size(); ull++) {
-                    prod = 1.0;
-                    for(ulj = uli + 1; ulj < edges.size(); ulj++) {
-                        prod *= this->edges[ulj]->variable_to_factor_message[this->edges[uli]->edgewise_fullfill_table[g][ull][ulj]];
-                    }
-                    for(ulj = 0; ulj < uli; ulj++) {
-                        prod *= this->edges[ulj]->variable_to_factor_message[this->edges[uli]->edgewise_fullfill_table[g][ull][ulj]];
-                    }
-                    sum += prod;
+                for(ulj = uli + 1; ulj < this->edges.size(); ulj++) {
+                    product[g] *= Q[ulj][g];
                 }
-                this->edges[uli]->factor_to_variable_message[g] = sum;
+                for(ulj = 0; ulj < uli; ulj++) {
+                    product[g] *= Q[ulj][g];
+                }
             }
+            R = fourier_transform(product);
+            for(g = 0; g < (uint64_t)(gf->q); g++) R[g] = R[g]/(double)(2*(uint64_t)(gf->q)); /* renormalize for inverse fourier transformation */
+            this->edges[uli]->factor_to_variable_message = R;
+            for(g = 0; g < (uint64_t)(gf->q); g++) product[g] = 1.0;
         }
     }
 };

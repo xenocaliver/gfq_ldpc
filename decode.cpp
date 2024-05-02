@@ -50,7 +50,7 @@ std::vector<std::vector<double> > get_a_priori_probability(std::vector<std::vect
             prior_probability = 1.0;
             for(ulk = 0; ulk < m; ulk++) {
                 b = (int64_t)(value & 1);
-                prior_probability *= (1 + exp(2.0*BPSK((double)b)*channel_output[uli][ulk]/(sigma*sigma)));
+                prior_probability *= (1.0 + exp(2.0*BPSK((double)b)*channel_output[uli][ulk]/(sigma*sigma)));
                 value = value >> 1;
             }
             f[uli][q - 1 - ulj] = 1.0/prior_probability;
