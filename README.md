@@ -13,6 +13,7 @@ Install following tools.
 - [galois++](https://github.com/wkjarosz/galois)
 - [fftw](https://www.fftw.org)
 
+[galois++](https://github.com/wkjarosz/galois) and [fftw](https://www.fftw.org) are downloaded and compiled during this simulator's compilation process.
 ## Downloading the simulator
 Clone simulator's repository.
 
@@ -29,6 +30,8 @@ cd build
 cmake ..
 make
 ```
+
+
 ## Make generating matrix
 Before running the simulator, you must create generating matrix.
 You can convert parity check matrix alist file into generating matrix as follows. 
