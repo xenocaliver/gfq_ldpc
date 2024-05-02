@@ -115,7 +115,7 @@ $$
 Factor to variable node message update processes are given by
 
 $$
-r_{nm}(g)=\sum_{x_{i_{1}}}\cdots\sum_{x_{i_{d_{c}-1}}}\boldsymbol{1}[\sum_{k=1}^{d_{c}}h_{mi_{k}}x_{i_{k}}=0|x_{n} = g]\prod_{i_{k}\in∂ m\backslash n}q_{mn^{\prime}}(x_{i_{k}})
+r_{nm}(g)=\sum_{x_{i_{1}}}\cdots\sum_{x_{i_{d_{c}-1}}}\boldsymbol{1}[\sum_{k=1}^{d_{c}}h_{mi_{k}}x_{i_{k}}=0|x_{n} = g]\prod_{n^{\prime}\in∂ m\backslash n}q_{mn^{\prime}}(x_{i_{k}})
 $$
 
 where $\boldsymbol{1}$ denotes an indicator function i.e.
@@ -128,8 +128,32 @@ $$
 \end{cases}
 $$
 
+However, this update rule's computing complexity is very large and is not practical. Threfore, we use fourier transformaion according to [Hong](https://ieeexplore.ieee.org/document/6113595/). Another update rule is shown as follows. At first, we apply fourier transformation to variable to factor messages as follows:
+
+$$
+\bm{Q}_{mn} = \mathscr{F}\left[\bm{q}_{mn}\right]
+$$
+
+where $\bm{Q}_{mn} = (Q_{mn}(0),Q{mn}(1),\ldots,Q_{mn}(2^{M}-1))$ and $\bm{q}_{mn} = (q_{mn}(0), q_{mn}(1),\ldots, q_{mn}(2^{M}-1))$. And we update factor to variable messages in frequency domain $\bm{R}_{nm}$ as follows:
+
+$$
+R_{nm}(g) = \prod_{n^{\prime}\in\partial m\backslash n}Q_{mn}(g)\,\,\,(g = 0, 1,\ldots,2^{M}-1).
+$$
+
+Then, we apply inverse fourier transform to $\bm{R}_{mn}$ and get variable to factor messages in real domain as follows:
+
+$$
+\bm{r}_{nm} = \mathscr{F}^{-1}\left[\bm{R}_{nm}\right].
+$$
+
+Due to discrete fourier transformation's property, we must do following renormalization:
+
+$$
+r_{nm}(g)\rightarrow r_{nm}(g)/2^{M}.
+$$
+
 ### Variable to factor message update
-Variable to factor node message updte processes are given by
+Variable to factor node message update processes are given by
 
 $$
 q_{mn}(g)=f_{n}(g)\prod_{m^{\prime}\in\partial n\backslash m}r_{nm^{\prime}}(g).
@@ -147,5 +171,5 @@ $$
 Finally, speculated $n-$th symbol $\hat{g}_{n}$ is given by
 
 $$
-\hat{g}_{n}=\operatorname{argmax}_{g}p_{n}(g).
+\hat{x}_{n}=\mathrm{argmax}_{g}p_{n}(g).
 $$
