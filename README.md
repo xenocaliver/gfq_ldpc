@@ -140,7 +140,7 @@ $$
 where $\bm{Q}_{mn} = (Q_{mn}(0),Q_{mn}(1),\ldots,Q_{mn}(2^{M}-1))$ and $\bm{q}_{mn} = (q_{mn}(0), q_{mn}(1),\ldots, q_{mn}(2^{M}-1))$. And we update factor to variable messages in frequency domain $\bm{R}_{nm}$ as follows:
 
 $$
-R_{nm}(g) = \prod_{n^{\prime}\in\partial m\backslash n}Q_{mn}(g)\,\,\,(g = 0, 1,\ldots,2^{M}-1).
+R_{nm}(g) = \prod_{n^{\prime}\in\partial m\backslash n}Q_{mn^{\prime}}(g)\,\,\,(g = 0, 1,\ldots,2^{M}-1).
 $$
 
 Then, we apply inverse fourier transform to $\bm{R}_{mn}$ and get variable to factor messages in real domain as follows:

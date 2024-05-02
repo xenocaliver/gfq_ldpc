@@ -101,11 +101,13 @@ int main(int argc, char* argv[]) {
         }
         /* encode */
         codeword = encode(input_vector, generating_matrix, &gf);
+#ifdef DEBUG
         std::cout << "*** encoded word ***" << std::endl;
         for(uli = 0; uli < codeword.size(); uli++) {
             std::cout << std::setw(2) << codeword[uli].value() << " ";
         }
         std::cout << std::endl;
+#endif
         /* add awgn noise */
         received_signals = transmit(codeword, &gf, sigma, &mt);
         /* calculate a priori probability */

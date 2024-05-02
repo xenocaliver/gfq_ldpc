@@ -45,7 +45,6 @@ public:                                                /*                     */
         double product;                                /*                     */
         double sum;
         std::vector<double> new_message(characteristic, 1.0);
-        double msg;
 
         for(uli = 0; uli < this->edges.size(); uli++) {
             for(g = 0; g < characteristic; g++) {
@@ -75,7 +74,6 @@ public:                                                /*                     */
         double product;                                /*                     */
         double sum = 0.0;
         double max = -1000.0;
-        double lower_limit = 0.0001;
         uint64_t rtnv = 0;
         std::vector<double> new_message(characteristic, 1.0);
 
