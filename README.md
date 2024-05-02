@@ -152,7 +152,7 @@ $$
 Due to discrete fourier transformation's property, we must do following renormalization:
 
 $$
-r_{nm}(g)\Leftarrow r_{nm}(g)/2^{M}.
+r_{nm}(g)\Leftarrow r_{nm}(g)/2^{M+1}.
 $$
 
 ### Variable to factor message update
