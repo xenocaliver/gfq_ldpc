@@ -131,10 +131,10 @@ $$
 However, this update rule's computing complexity is very large and is not practical. Threfore, we use fourier transformaion according to [Hong](https://ieeexplore.ieee.org/document/6113595/). Another update rule is shown as follows. At first, we apply fourier transformation to variable to factor messages as follows:
 
 $$
-\bm{Q}_{mn} = \mathscr{F}\left[\bm{q}_{mn}\right]
+\vec{Q}_{mn} = \mathscr{F}\left[\vec{q}_{mn}\right]
 $$
 
-where $\bm{Q}_{mn} = (Q_{mn}(0),Q{mn}(1),\ldots,Q_{mn}(2^{M}-1))$ and $\bm{q}_{mn} = (q_{mn}(0), q_{mn}(1),\ldots, q_{mn}(2^{M}-1))$. And we update factor to variable messages in frequency domain $\bm{R}_{nm}$ as follows:
+where $\vec{Q}_{mn} = (Q_{mn}(0),Q{mn}(1),\ldots,Q_{mn}(2^{M}-1))$ and $\vec{q}_{mn} = (q_{mn}(0), q_{mn}(1),\ldots, q_{mn}(2^{M}-1))$. And we update factor to variable messages in frequency domain $\vec{R}_{nm}$ as follows:
 
 $$
 R_{nm}(g) = \prod_{n^{\prime}\in\partial m\backslash n}Q_{mn}(g)\,\,\,(g = 0, 1,\ldots,2^{M}-1).
@@ -143,13 +143,13 @@ $$
 Then, we apply inverse fourier transform to $\bm{R}_{mn}$ and get variable to factor messages in real domain as follows:
 
 $$
-\bm{r}_{nm} = \mathscr{F}^{-1}\left[\bm{R}_{nm}\right].
+\vec{r}_{nm} = \mathscr{F}^{-1}\left[\vec{R}_{nm}\right].
 $$
 
 Due to discrete fourier transformation's property, we must do following renormalization:
 
 $$
-r_{nm}(g)\rightarrow r_{nm}(g)/2^{M}.
+r_{nm}(g)\Leftarrow r_{nm}(g)/2^{M}.
 $$
 
 ### Variable to factor message update
