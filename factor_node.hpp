@@ -45,6 +45,7 @@ public:                                                /*                     */
     std::vector<double> fourier_transform(std::vector<double> q) {
         std::vector<double> Q(q.size(), 0.0);
 
+        fftw_make_planner_thread_safe();
         fftw_plan plan = fftw_plan_r2r_1d(q.size(), q.data(), Q.data(), FFTW_REDFT11, FFTW_MEASURE);
         fftw_execute(plan);
         fftw_destroy_plan(plan);
@@ -61,6 +62,7 @@ public:                                                /*                     */
         for(uli = 0; uli < this->edges.size(); uli++) {
             Q[uli] = fourier_transform(this->edges[uli]->variable_to_factor_message);
         }
+
         for(uli = 0; uli < this->edges.size(); uli++) {
             for(g = 0; g < (uint64_t)(gf->q); g++) {
                 for(ulj = uli + 1; ulj < this->edges.size(); ulj++) {

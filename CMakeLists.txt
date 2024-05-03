@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
 project(gfq_ldpc CXX)
 #C++ standard option 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20)
 
 # set current directory for include files
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -18,7 +18,7 @@ set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${PROJECT_BINARY_DIR}/include)
 link_directories(${DEPEND_LIB_ROOT})
 
-set(CMAKE_CXX_FLAGS "-O3 -Wall -g -fPIC -fmessage-length=0 -I/opt/homebrew/include -I${PROJECT_BINARY_DIR}/include -L/opt/homebrew/lib")
+set(CMAKE_CXX_FLAGS "-O3 -Wall -g -fPIC -fmessage-length=0 -DDEBUG -std=c++20 -I/opt/homebrew/include -I${PROJECT_BINARY_DIR}/include -L/opt/homebrew/lib")
 
 set(galois_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/galois)
 set(galois_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/lib)
@@ -86,6 +86,7 @@ ExternalProject_Add(fftw3
     UPDATE_COMMAND ""
 ### install command
     INSTALL_COMMAND cp ${fftw3_PREFIX}/src/fftw-${fftw3_VERSION}/.libs/libfftw3.a ${fftw3_INSTALL_DIR}/ && 
+                    cp ${fftw3_PREFIX}/src/fftw-${fftw3_VERSION}/threads/.libs/libfftw3_threads.a ${fftw3_INSTALL_DIR}/ &&
                     cp -r ${fftw3_PREFIX}/src/fftw-${fftw3_VERSION}/api/fftw3.h ${PROJECT_BINARY_DIR}/include
 )
 
@@ -98,4 +99,4 @@ target_link_libraries(make-gen ${DEPEND_LIB_ROOT}/libgalois++.a m)
 
 add_executable(gfq_simulator gfq_simulator.cpp decode.cpp encode.cpp transmit.cpp get_generating_matrix.cpp generating_matrix.hpp gfq_alist.hpp edge.hpp variable_node.hpp factor_node.hpp transmit.cpp factor_graph.cpp split.cpp split.hpp)
 add_dependencies(gfq_simulator galois fftw3)
-target_link_libraries(gfq_simulator ${DEPEND_LIB_ROOT}/libgalois++.a ${DEPEND_LIB_ROOT}/libfftw3.a m)
+target_link_libraries(gfq_simulator ${DEPEND_LIB_ROOT}/libgalois++.a ${DEPEND_LIB_ROOT}/libfftw3.a ${DEPEND_LIB_ROOT}/libfftw3_threads.a m)

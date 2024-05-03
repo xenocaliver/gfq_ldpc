@@ -22,6 +22,7 @@
 #include <iomanip>
 #include <cmath>
 #include <random>
+#include <thread>
 
 #include <galois++/array2d.h>
 #include <galois++/element.h>
@@ -42,6 +43,44 @@ extern std::vector<std::vector<Galois::Element> > load_generating_matrix(std::st
 extern bool parity_check(std::vector<uint64_t>, std::vector<std::vector<std::pair<uint64_t, uint64_t> > >, const Galois::Field*); 
 extern std::vector<Galois::Element> encode(std::vector<Galois::Element>&, std::vector<std::vector<Galois::Element> >&, const Galois::Field*);
 extern uint64_t rdtsc(void);
+
+/* for multi-thread processing */
+std::vector<std::vector<uint64_t> > get_modulo_ids(uint64_t number_of_nodes, uint64_t concurrency) {
+    std::vector<uint64_t> v;
+    std::vector<std::vector<uint64_t> > rtnv;
+    uint64_t uli, ulj;
+    uint64_t q, r;
+
+    q = number_of_nodes/concurrency;
+    r = number_of_nodes%concurrency;
+
+    for(uli = 0; uli < concurrency; uli++) {
+        for(ulj = 0; ulj < q; ulj++) {
+            v.push_back(concurrency*uli + ulj);
+        }
+        rtnv.push_back(v);
+        v.clear();
+    }
+    for(uli = q*concurrency; uli < q*concurrency + r; uli++) v.push_back(uli);
+    rtnv.push_back(v);
+    return(rtnv);
+}
+
+void update_factor_nodes(std::vector<factor_node>& factor_nodes, std::vector<uint64_t>& node_ids, Galois::Field* gf) {
+    std::vector<uint64_t>::iterator vit;
+
+    for(vit = node_ids.begin(); vit != node_ids.end(); ++vit) {
+        factor_nodes[*vit].update_messages(gf);
+    }
+}
+
+void update_variable_nodes(std::vector<variable_node>& variable_nodes, std::vector<uint64_t>& node_ids, Galois::Field* gf) {
+    std::vector<uint64_t>::iterator vit;
+
+    for(vit = node_ids.begin(); vit != node_ids.end(); ++vit) {
+        variable_nodes[*vit].update_messages(gf);
+    }
+}
 
 int main(int argc, char* argv[]) {
     double sigma;
@@ -64,6 +103,10 @@ int main(int argc, char* argv[]) {
     bool parity_check_result;
     uint64_t error_count = 0;
     double frame_error_rate;
+    uint64_t hardware_concurrency;
+    std::vector<std::vector<uint64_t> > factor_modulo, variable_modulo;
+    std::vector<std::thread> factor_threads, variable_threads;
+    std::vector<std::thread>::iterator tit;
 
     if(argc != 6) {
         std::cerr << "Usage: " << argv[0] << " <alist file> <generating matrix file> <number of trial> <sigma> <iteration limit>" << std::endl;
@@ -90,6 +133,17 @@ int main(int argc, char* argv[]) {
             variable_nodes[uli].edges[ulj]->factor_to_variable_message.resize((uint64_t)(gf.q));
         }
     }
+
+    /* for multi-threading */
+    hardware_concurrency = std::thread::hardware_concurrency();                         /* get system's max number of threads */
+    if(hardware_concurrency == 0) {
+        std::cout << "Hardware concurrency = 0. You must modify this code for single thread." << std::endl;
+        return(-1);
+    }
+
+    std::cout << "hardware concurrency = " << hardware_concurrency << std::endl;
+    factor_modulo = get_modulo_ids(alist.number_of_rows, hardware_concurrency);
+    variable_modulo = get_modulo_ids(alist.number_of_columns, hardware_concurrency);
 
     /* main loop */
     for(trial = 0; trial < number_of_trial; trial++) {
@@ -132,8 +186,20 @@ int main(int argc, char* argv[]) {
         /* do decoding process */
         for(iteration = 0; iteration < iteration_limit; iteration++) {
             /* update messages */
-            for(uli = 0; uli < factor_nodes.size(); uli++) factor_nodes[uli].update_messages(&gf);
-            for(uli = 0; uli < variable_nodes.size(); uli++) variable_nodes[uli].update_messages(&gf);
+            for(uli = 0; uli < hardware_concurrency + 1; uli++) {
+                std::thread worker(update_factor_nodes, std::ref(factor_nodes), std::ref(factor_modulo[uli]), &gf);
+                factor_threads.emplace_back(std::move(worker));
+            }
+            for(tit = factor_threads.begin(); tit != factor_threads.end(); ++tit) tit->join();
+            factor_threads.clear();
+
+            for(uli = 0; uli < hardware_concurrency + 1; uli++) {
+                std::thread worker(update_variable_nodes, std::ref(variable_nodes), std::ref(variable_modulo[uli]), &gf);
+                variable_threads.emplace_back(std::move(worker));
+            }
+            for(tit = variable_threads.begin(); tit != variable_threads.end(); ++tit) tit->join();
+            variable_threads.clear();
+
             /* speculate code word */
             for(uli = 0; uli < variable_nodes.size(); uli++) speculated_codeword[uli] = variable_nodes[uli].speculate_temporal_symbol(&gf);
             parity_check_result = parity_check(speculated_codeword, alist.mlist, &gf);
