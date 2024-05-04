@@ -23,6 +23,7 @@
 #include <cmath>
 #include <random>
 #include <thread>
+#include <chrono>
 
 #include <galois++/array2d.h>
 #include <galois++/element.h>
@@ -107,9 +108,13 @@ int main(int argc, char* argv[]) {
     std::vector<std::vector<uint64_t> > factor_modulo, variable_modulo;
     std::vector<std::thread> factor_threads, variable_threads;
     std::vector<std::thread>::iterator tit;
+    uint64_t elapsed_count_in_microseconds;
+    uint64_t sum_elapsed_time = 0;
+    double average_execution_time = 0.0;
+    uint64_t progress_interval = 100;
 
-    if(argc != 6) {
-        std::cerr << "Usage: " << argv[0] << " <alist file> <generating matrix file> <number of trial> <sigma> <iteration limit>" << std::endl;
+    if(argc != 7) {
+        std::cerr << "Usage: " << argv[0] << " <alist file> <generating matrix file> <number of trial> <sigma> <iteration limit> <print progress interval>" << std::endl;
         return(EXIT_FAILURE);
     }
 
@@ -122,6 +127,7 @@ int main(int argc, char* argv[]) {
     Galois::Element gfe(&gf, 0);
     sigma = std::stod(argv[4]);
     std::mt19937_64 mt(1234);
+    progress_interval = std::strtoull(argv[6], nullptr, 10);
     std::uniform_int_distribution<uint64_t> input_symbol(0, alist.characteristic - 1);
     uint64_t number_of_trial = std::strtoull(argv[3], nullptr, 10);
     generating_matrix = load_generating_matrix(std::string(argv[2]), &gf);
@@ -147,6 +153,7 @@ int main(int argc, char* argv[]) {
 
     /* main loop */
     for(trial = 0; trial < number_of_trial; trial++) {
+        auto start = std::chrono::high_resolution_clock::now();
         /* generate input words */
         for(uli = 0; uli < dimension; uli++) {
             g = input_symbol(mt);
@@ -207,6 +214,15 @@ int main(int argc, char* argv[]) {
         }
         if(parity_check_result == false) {
             error_count++;
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = end - start;
+        std::chrono::microseconds d = std::chrono::duration_cast<std::chrono::microseconds>(duration);
+        elapsed_count_in_microseconds = std::chrono::duration_cast<std::chrono::microseconds>(d).count();
+        sum_elapsed_time += elapsed_count_in_microseconds;
+        if((trial + 1)%progress_interval == 0) {
+            average_execution_time = (double)sum_elapsed_time/(double)(trial + 1);
+            std::cout << trial << " average execution time = " << average_execution_time << " us" << std::endl;
         }
     }
     frame_error_rate = (double)error_count/(double)number_of_trial;

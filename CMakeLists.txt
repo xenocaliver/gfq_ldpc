@@ -18,7 +18,7 @@ set(CMAKE_PREFIX_PATH ${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${PROJECT_BINARY_DIR}/include)
 link_directories(${DEPEND_LIB_ROOT})
 
-set(CMAKE_CXX_FLAGS "-O3 -Wall -g -fPIC -fmessage-length=0 -DDEBUG -std=c++20 -I/opt/homebrew/include -I${PROJECT_BINARY_DIR}/include -L/opt/homebrew/lib")
+set(CMAKE_CXX_FLAGS "-O3 -Wall -g -fPIC -fmessage-length=0 -std=c++20 -I/opt/homebrew/include -I${PROJECT_BINARY_DIR}/include -L/opt/homebrew/lib")
 
 set(galois_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/galois)
 set(galois_INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/lib)

@@ -25,7 +25,6 @@ public:
     uint64_t ID;
     std::vector<double> factor_to_variable_message;
     std::vector<double> variable_to_factor_message;
-    std::vector<std::vector<std::vector<uint64_t> > > edgewise_fullfill_table;
 
     /* default constructor */
     edge(void) : ID(0) {}
