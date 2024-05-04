@@ -24,6 +24,7 @@
 #include <random>
 #include <thread>
 #include <chrono>
+#include <format>
 
 #include <galois++/array2d.h>
 #include <galois++/element.h>
@@ -151,6 +152,13 @@ int main(int argc, char* argv[]) {
     factor_modulo = get_modulo_ids(alist.number_of_rows, hardware_concurrency);
     variable_modulo = get_modulo_ids(alist.number_of_columns, hardware_concurrency);
 
+    try {
+        std::cout << std::format("{:^12s}{:s}","count", "  average execution time[us]") << std::endl;
+        std::cout << "------------------------------------------------------------" << std::endl;
+    } catch(const std::format_error& e) {
+        std::cerr << e.what() << std::endl;
+        return(-1);
+    }
     /* main loop */
     for(trial = 0; trial < number_of_trial; trial++) {
         auto start = std::chrono::high_resolution_clock::now();
@@ -222,7 +230,12 @@ int main(int argc, char* argv[]) {
         sum_elapsed_time += elapsed_count_in_microseconds;
         if((trial + 1)%progress_interval == 0) {
             average_execution_time = (double)sum_elapsed_time/(double)(trial + 1);
-            std::cout << trial << " average execution time = " << average_execution_time << " us" << std::endl;
+            try{
+                std::cout << std::format("{:>12d}{:>28f}", trial + 1, average_execution_time) << std::endl;
+            } catch(const std::format_error& e) {
+                std::cerr << e.what() << std::endl;
+                return(-1);
+            }
         }
     }
     frame_error_rate = (double)error_count/(double)number_of_trial;
