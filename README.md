@@ -105,7 +105,7 @@ $$
 
 ### Decoding
 We employ probability region Sum-Product algorithm for decoding according to [Davey](https://ieeexplore.ieee.org/document/706440).
-Let $q_{mn}(g)$ be a veriable node $n$ to factor node message $m$ where g is a finite field element's value. Let $r_{nm}$ be a factor node $m$ to variable node $n$ message.
+Let $q_{mn}(g)$ be a veriable node $n$ to factor node message $m$ where $g$ is a finite field element's value. Let $r_{nm}$ be a factor node $m$ to variable node $n$ message.
 
 ### Initialization
 For all variable nodes, initialize messages as follows:
