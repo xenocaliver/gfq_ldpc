@@ -131,7 +131,7 @@ $$
 \end{cases}
 $$
 
-However, this update rule's computing complexity is very large and is not practical. Threfore, we use fourier transformaion according to [Hong](https://ieeexplore.ieee.org/document/6113595/). Another update rule is shown as follows. At first, we apply fourier transformation $\mathscr{F}$ to variable to factor messages as follows:
+However, this update rule's computing complexity is very large and is not practical. Threfore, we use Fourier transformaion according to [Hong](https://ieeexplore.ieee.org/document/6113595/). Another update rule is shown as follows. At first, we apply Fourier transformation $\mathscr{F}$ to variable to factor messages as follows:
 
 $$
 \boldsymbol{Q}_{mn} = \mathscr{F}\left[\boldsymbol{q}_{mn}\right]
@@ -143,13 +143,13 @@ $$
 R_{nm}(g) = \prod_{n^{\prime}\in\partial m\backslash n}Q_{mn^{\prime}}(g)\,\,\,(g = 0, 1,\ldots,2^{M}-1).
 $$
 
-Then, we apply inverse fourier transform to $\boldsymbol{R}_{mn}$ and get variable to factor messages in real domain as follows:
+Then, we apply inverse Fourier transform to $\boldsymbol{R}_{mn}$ and get variable to factor messages in real domain as follows:
 
 $$
 \boldsymbol{r}_{nm} = \mathscr{F}^{-1}\left[\boldsymbol{R}_{nm}\right].
 $$
 
-Due to discrete fourier transformation's property, we must do following renormalization:
+Due to discrete Fourier transformation's property, we must do following renormalization:
 
 $$
 r_{nm}(g)\Leftarrow r_{nm}(g)/2^{M+1}.
