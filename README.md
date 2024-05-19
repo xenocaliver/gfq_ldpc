@@ -54,7 +54,7 @@ Thus parity check and encoding part of the simulator code are very simple.
 
 ### Encoding
 The simulator's generating matrix is constructed as follows.
-Let $`\boldsymbol{c}`$ a codeword(column vector), $H$ a parity check matrix. If $\boldsymbol{c}$ is a codeword, 
+Let $\boldsymbol{c}$ a codeword(column vector), $H$ a parity check matrix. If $\boldsymbol{c}$ is a codeword, 
 $$
 H\boldsymbol{c}=\boldsymbol{0}
 $$
