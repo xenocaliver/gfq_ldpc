@@ -4,6 +4,7 @@ plugins:
 use_math: true
 markdown: kramdown
 kramdown:
-  math_engine: katex
+  math_engine: mathjax
+  smart_quotes: ["apos", "apos", "quot", "quot"]
   syntax_highlighter: rouge
 google_analytics:
