@@ -134,19 +134,19 @@ $$
 However, this update rule's computing complexity is very large and is not practical. Threfore, we use fourier transformaion according to [Hong](https://ieeexplore.ieee.org/document/6113595/). Another update rule is shown as follows. At first, we apply fourier transformation $\mathscr{F}$ to variable to factor messages as follows:
 
 $$
-\bm{Q}_{mn} = \mathscr{F}\left[\bm{q}_{mn}\right]
+\boldsymbol{Q}_{mn} = \mathscr{F}\left[\boldsymbol{q}_{mn}\right]
 $$
 
-where $\bm{Q}_{mn} = (Q_{mn}(0),Q_{mn}(1),\ldots,Q_{mn}(2^{M}-1))$ and $\bm{q}_{mn} = (q_{mn}(0), q_{mn}(1),\ldots, q_{mn}(2^{M}-1))$. And we update factor to variable messages in frequency domain $\bm{R}_{nm}$ as follows:
+where $\boldsymbol{Q}_{mn} = (Q_{mn}(0),Q_{mn}(1),\ldots,Q_{mn}(2^{M}-1))$ and $\boldsymbol{q}_{mn} = (q_{mn}(0), q_{mn}(1),\ldots, q_{mn}(2^{M}-1))$. And we update factor to variable messages in frequency domain $\boldsymbol{R}_{nm}$ as follows:
 
 $$
 R_{nm}(g) = \prod_{n^{\prime}\in\partial m\backslash n}Q_{mn^{\prime}}(g)\,\,\,(g = 0, 1,\ldots,2^{M}-1).
 $$
 
-Then, we apply inverse fourier transform to $\bm{R}_{mn}$ and get variable to factor messages in real domain as follows:
+Then, we apply inverse fourier transform to $\boldsymbol{R}_{mn}$ and get variable to factor messages in real domain as follows:
 
 $$
-\bm{r}_{nm} = \mathscr{F}^{-1}\left[\bm{R}_{nm}\right].
+\boldsymbol{r}_{nm} = \mathscr{F}^{-1}\left[\boldsymbol{R}_{nm}\right].
 $$
 
 Due to discrete fourier transformation's property, we must do following renormalization:
