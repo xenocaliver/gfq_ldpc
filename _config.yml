@@ -1,4 +1,4 @@
-theme: jekyll-theme-cayman
+theme: leap-day
 layout: default
 use_math: true
 kramdown:
