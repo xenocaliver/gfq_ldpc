@@ -133,9 +133,9 @@ $$
 
 However, this update rule's computing complexity is very large and is not practical. Threfore, we use Fourier transformaion according to [Hong](https://ieeexplore.ieee.org/document/6113595/). Another update rule is shown as follows. At first, we apply Fourier transformation $\mathscr{F}$ to variable to factor messages as follows:
 
-$$
+\[
 \boldsymbol{Q}_{mn} = \mathscr{F}\left[\boldsymbol{q}_{mn}\right]
-$$
+\]
 
 where $\boldsymbol{Q}_{mn} = (Q_{mn}(0),Q_{mn}(1),\ldots,Q_{mn}(2^{M}-1))$ and $\boldsymbol{q}_{mn} = (q_{mn}(0), q_{mn}(1),\ldots, q_{mn}(2^{M}-1))$. And we update factor to variable messages in frequency domain $\boldsymbol{R}_{nm}$ as follows:
 
