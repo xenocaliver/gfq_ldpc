@@ -55,9 +55,11 @@ Thus parity check and encoding part of the simulator code are very simple.
 ### Encoding
 The simulator's generating matrix is constructed as follows.
 Let $\boldsymbol{c}$ a codeword(column vector), $H$ a parity check matrix. If $\boldsymbol{c}$ is a codeword, 
+
 $$
 H\boldsymbol{c}=\boldsymbol{0}
 $$
+
 holds. And we assume we can split $\boldsymbol{c}$ into two parts $\boldsymbol{p}$ and $\boldsymbol{s}$. $\boldsymbol{p}$ represents a parity check symbol part and $\boldsymbol{s}$ represents input symbol part.
 And we devide $H$ into two part i.e.
 
