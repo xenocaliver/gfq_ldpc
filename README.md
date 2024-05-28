@@ -18,7 +18,7 @@ Install following tools.
 Clone simulator's repository.
 
 ```sh
-git clone git@github.com:xenocaliver/gfq_ldpc.git
+git clone git@github.com:xenocaliver/gfq_ldpc.git ./
 ```
 
 ## Build the simulator
@@ -43,7 +43,7 @@ You can convert parity check matrix alist file into generating matrix as follows
 Then, you can run the simulator as follows.
 
 ```sh
-./gfq_simulator <alist file name> <generating matrix file name> <number of transmission> <sigma for AWGN channel> <Sum-Product iteration limit>
+./gfq_simulator <alist file name> <generating matrix file name> <number of transmission> <sigma for AWGN channel> <Sum-Product iteration limit> <progress print interval>
 ```
 
 ## Illustration for implementation
