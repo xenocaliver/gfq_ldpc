@@ -1,5 +1,5 @@
-# gfq_ldpc
-Non-binary LDPC encode and decode simulation programs
+# Non-binary LDPC Code programs
+Non-binary LDPC codes encode and decode simulation programs
 
 ## Preparation
 Install following tools.
